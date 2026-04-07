@@ -7,15 +7,15 @@ const AuthPage = () => {
 
     return(
 
-            <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-            
+<div className="bg-gradient-to-r from-[#B83B04] via-[#F24E1E] via-[#4A2800] to-[#FEE8D2] min-h-screen flex items-center justify-center">
+          
             <div className="w-full max-w-xl bg-white rounded-xl shadow-lg 
             border border-gray-200 p-6 md: p-10">
             
                 {/* Logo */}
                 <div className="flex justify-center mb-6">
                         <img
-                        src="/src/assets/img/kinal_sports.png"
+                        src="/src/assets/img/pastor_kinaliani.png"
                         alt="Kinal Sport"
                         className="h-20 w-auto"
                         />
@@ -38,8 +38,8 @@ const AuthPage = () => {
                         {isForgot
                         ? "Ingresa tu correo electrónico para recuperar tu contraseña"
                         :isLogin
-                        ?"Ingresa a tu cuenta de administrador de kinal sport"
-                        :"Registrate como administrador de kinal sport"
+                        ?"Ingresa a tu cuenta de administrador de Pastor Kinaliani"
+                        :"Registrate como administrador de Pastor Kinaliani"
                         }
                     </p>
                 </div>
