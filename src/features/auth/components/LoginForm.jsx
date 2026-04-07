@@ -24,12 +24,27 @@ export const LoginForm = () => {
                 focus:ring-blue-500" />
             </div>
 
-            <button className="w-full bg-main-blue hover: opacity-90
+            <button className="w-full bg-orange-500 hover:bg-orange-600
             text-white font-medium py-2.5 px-4 rounded-lg 
             transition-colors duration-200 text-sm">
                 Iniciar Sesion
             </button>
 
+            <div className="flex justify-between text-sm mt-2">
+        <button
+          type="button"
+          className="text-blue-600 hover:underline"
+        >
+          ¿Olvidaste tu contraseña?
+        </button>
+
+        <button
+          type="button"
+          className="text-blue-600 hover:underline"
+        >
+          Registrarse
+        </button>
+        </div>
         </form>
     );
 }
