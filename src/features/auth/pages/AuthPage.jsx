@@ -23,8 +23,8 @@ const AuthPage = () => {
     };
 
     return (
-        <div className="bg-gradient-to-r from-[#B83B04] via-[#F24E1E] via-[#4A2800] to-[#FEE8D2] min-h-screen flex items-center justify-center">
-            <div className="w-full max-w-xl bg-white rounded-xl shadow-lg border border-gray-200 p-6 md:p-10">
+        <div className="bg-gradient-to-r from-[#009246] via-[45%] via-[#F5F5F5] to-[#CE2B37] min-h-screen flex items-center justify-center">    
+    <div className="w-full max-w-xl bg-white rounded-xl shadow-[0_20px_60px_rgba(0,0,0,0.25)] border border-gray-200 p-6 md:p-10">  
                 
                 {/* Logo */}
                 <div className="flex justify-center mb-6">
