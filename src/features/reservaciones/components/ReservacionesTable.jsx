@@ -37,15 +37,15 @@ export const ReservacionesCards = () => {
             src="/src/assets/img/add.png"
             alt="agregar"
             className="
-      w-5 h-5 
-      transition-transform duration-500 ease-in-out
-      sm:group-hover:-translate-x-[-120%] 
-      group-hover:scale-110
+            w-5 h-5 
+            transition-transform duration-500 ease-in-out
+            sm:group-hover:-translate-x-[-150%] 
+            group-hover:scale-110 filter invert
     "
           />
 
           {/* TEXTO */}
-          <span className="hidden sm:inline ml-2 whitespace-nowrap transition-all duration-500 transform sm:group-hover:translate-x-3">
+          <span className="hidden sm:inline ml-2 whitespace-nowrap transition-all duration-500 transform sm:group-hover:translate-x-3 sm:group-hover:opacity-0">
             Agregar
           </span>
 
@@ -86,12 +86,12 @@ export const ReservacionesCards = () => {
             <div className="flex gap-3 mt-5">
 
               {/* EDITAR */}
-              <button className="group relative flex-1 py-2 rounded-lg bg-main-blue text-white flex items-center justify-center overflow-hidden transition-all duration-300">
+              <button className="group relative flex-1 py-2 rounded-lg bg-main-green text-white flex items-center justify-center overflow-hidden transition-all duration-300">
 
                 <img
                   src="/src/assets/img/pencil.png"
                   alt="editar"
-                  className="w-5 h-5 transition-transform duration-500 ease-in-out sm:group-hover:-translate-x-[-120%] group-hover:scale-110"
+                  className="w-5 h-5 transition-transform duration-500 ease-in-out sm:group-hover:-translate-x-[-120%] group-hover:scale-110 filter invert"
                 />
 
                 <span className="hidden sm:inline ml-2 whitespace-nowrap transition-all duration-300 transform sm:group-hover:translate-x-3 sm:group-hover:opacity-0">
@@ -101,12 +101,12 @@ export const ReservacionesCards = () => {
               </button>
 
               {/* ELIMINAR */}
-              <button className="group relative flex-1 py-2 rounded-lg bg-red-600 text-white flex items-center justify-center overflow-hidden transition-all duration-300 hover:bg-red-700">
+              <button className="group relative flex-1 py-2 rounded-lg bg-orange-600 text-white flex items-center justify-center overflow-hidden transition-all duration-300 hover:bg-orange-700">
 
                 <img
                   src="/src/assets/img/delete.png"
                   alt="eliminar"
-                  className="w-5 h-5 transition-transform duration-500 ease-in-out sm:group-hover:-translate-x-[-120%] group-hover:scale-110"
+                  className="w-5 h-5 transition-transform duration-500 ease-in-out sm:group-hover:-translate-x-[-150%] group-hover:scale-110 filter invert"
                 />
 
                 <span className="hidden sm:inline ml-2 whitespace-nowrap transition-all duration-300 transform sm:group-hover:translate-x-3 sm:group-hover:opacity-0">
