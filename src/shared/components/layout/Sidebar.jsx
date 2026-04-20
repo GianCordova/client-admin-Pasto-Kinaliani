@@ -18,7 +18,7 @@ export const Sidebar = ({ setView }) => {
 
   return (
     <aside className="w-60 bg-white min-h-[calc(100vh-4rem)] p-4 shadow-sm relative">
-      
+
       {/* Fondo animado */}
       <div
         className="absolute left-4 right-4 h-10 bg-orange-400 rounded-lg transition-all duration-300"
@@ -33,13 +33,12 @@ export const Sidebar = ({ setView }) => {
             <div
               onClick={() => {
                 setActiveIndex(index);
-                setView(item.label); // 🔥 ESTO FALTABA
+                setView(item.label);
               }}
               className={`px-4 py-2 rounded-lg font-medium cursor-pointer transition-colors relative z-10
-                ${
-                  activeIndex === index
-                    ? "text-white"
-                    : "text-gray-700 hover:bg-orange-100"
+                ${activeIndex === index
+                  ? "text-white"
+                  : "text-gray-700 hover:bg-orange-100"
                 }`}
             >
               {item.label}

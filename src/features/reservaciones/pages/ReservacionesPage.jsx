@@ -1,9 +1,9 @@
-import { ReservacionesTable } from "../components/ReservacionesTable";
+import { ReservacionesCards } from "../components/ReservacionesTable";
 
 export const ReservacionesPage = () => {
   return (
     <div>
-      <ReservacionesTable />
+      <ReservacionesCards />
     </div>
   );
 };
