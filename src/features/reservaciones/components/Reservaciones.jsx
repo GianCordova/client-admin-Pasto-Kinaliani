@@ -1,4 +1,9 @@
+import { useState } from "react";
+import { ReservacionesForm } from "./ReservacionesForm";
+
 export const ReservacionesCards = () => {
+
+  const [open, setOpen] = useState(false);
 
   const data = [
     {
@@ -30,7 +35,7 @@ export const ReservacionesCards = () => {
         </h2>
 
         {/* BOTÓN AGREGAR */}
-        <button className="group relative px-3 sm:px-5 py-2 rounded-lg bg-main-blue text-white flex items-center justify-center overflow-hidden transition-all duration-300 hover:shadow-lg">
+        <button onClick={() => setOpen(true)} className="group relative px-3 sm:px-5 py-2 rounded-lg bg-main-blue text-white flex items-center justify-center overflow-hidden transition-all duration-300 hover:shadow-lg">
 
           {/* ICONO */}
           <img
@@ -49,7 +54,9 @@ export const ReservacionesCards = () => {
             Agregar
           </span>
 
-        </button>
+        </button>{open && (
+          <ReservacionesForm onClose={() => setOpen(false)} />
+        )}
 
       </div>
 
@@ -86,7 +93,7 @@ export const ReservacionesCards = () => {
             <div className="flex gap-3 mt-5">
 
               {/* EDITAR */}
-              <button className="group relative flex-1 py-2 rounded-lg bg-main-green text-white flex items-center justify-center overflow-hidden transition-all duration-300">
+              <button className="group relative flex-1 py-2 rounded-lg bg-main-blue text-white flex items-center justify-center overflow-hidden transition-all duration-300">
 
                 <img
                   src="/src/assets/img/pencil.png"

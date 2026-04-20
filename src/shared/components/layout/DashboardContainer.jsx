@@ -1,23 +1,60 @@
 import { useState } from "react";
 import { Navbar } from "./Navbar";
 import { Sidebar } from "./Sidebar";
-
-import { ReservacionesPage } from "../../../features/reservaciones/pages/ReservacionesPage.jsx";
-// importa más vistas aquí cuando las tengas
-// import { EquiposPage } from "...";
+import { ReservacionesCards } from "../../../features/reservaciones/components/Reservaciones.jsx";
+import { PedidosCards } from "../../../features/pedidos/components/Pedidos.jsx";
 
 export const DashboardContainer = () => {
 
-  const [view, setView] = useState("Reservaciones");
+  const [view, setView] = useState("welcome");
 
   const renderView = () => {
     switch (view) {
 
+      case "Empleados":
+        return <EmpleadosPage />;
+
+      case "Inventario":
+        return <InventarioPage />;
+
+      case "Mesas":
+        return <MesasPage />;
+
+      case "Pedidos":
+        return <PedidosCards />;
+
+      case "Platillos":
+        return <PlatillosPage />;
+
+      case "Proveedores":
+        return <ProveedoresPage />;
+
       case "Reservaciones":
-        return <ReservacionesPage />;
+        return <ReservacionesCards />;
+
+      case "Sucursales":
+        return <SucursalesPage />;
+
+      case "Usuarios":
+        return <UsuariosPage />;
+
+      case "Ventas":
+        return <VentasPage />;
+
+      case "welcome":
+        return (
+          <div className="flex flex-col items-center justify-center h-full text-center">
+            <h1 className="text-4xl font-bold text-gray-700 mb-4">
+              Bienvenido 👋
+            </h1>
+            <p className="text-gray-500">
+              Selecciona una opción del menú para comenzar
+            </p>
+          </div>
+        );
 
       default:
-        return <h2 className="text-gray-500">Vista no encontrada</h2>;
+        return <h2>Vista no encontrada</h2>;
     }
   };
 
@@ -30,8 +67,16 @@ export const DashboardContainer = () => {
 
         <Sidebar setView={setView} />
 
-        <main className="flex-1 p-6 bg-white/90 rounded-tl-2xl">
-          {renderView()}
+        <main className="flex-1 p-6 bg-white/90 rounded-tl-2xl relative overflow-hidden">
+
+          {/* CONTENIDO CON ANIMACIÓN */}
+          <div
+            key={view}
+            className="w-full h-full animate-fade"
+          >
+            {renderView()}
+          </div>
+
         </main>
 
       </div>
