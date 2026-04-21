@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { MesasModal } from './mesasModal';
+import { MesasModalDelete } from './mesasModalDelete';
 
 /**
  * Componente para la administración de mesas en el restaurante.
@@ -19,6 +21,26 @@ export const Mesas = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [filterStatus, setFilterStatus] = useState("todos");
 
+    // Modal State
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [selectedMesa, setSelectedMesa] = useState(null);
+
+    const handleOpenModal = (mesa = null) => {
+        setSelectedMesa(mesa);
+        setIsModalOpen(true);
+    };
+
+    const handleOpenDeleteModal = (mesa) => {
+        setSelectedMesa(mesa);
+        setIsDeleteModalOpen(true);
+    };
+
+    const handleConfirmDelete = () => {
+        // API call or state change for delete goes here
+        console.log("Deleted mesa:", selectedMesa?.id);
+    };
+
     return (
         <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
             {/* HEADER */}
@@ -30,8 +52,14 @@ export const Mesas = () => {
                     </p>
                 </div>
 
-                <button className="bg-orange-500 px-5 py-2.5 rounded-lg text-white font-semibold shadow-sm hover:bg-orange-600 transition-all flex items-center justify-center gap-2">
-                    <span className="text-xl">+</span> Agregar Mesa
+                <button 
+                    onClick={() => handleOpenModal()}
+                    className="bg-orange-400 px-5 py-2.5 rounded-lg text-white font-semibold shadow-md hover:bg-indigo-700 transition-all flex items-center justify-center gap-2"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                    </svg>
+                    Nueva Mesa
                 </button>
             </div>
 
@@ -52,7 +80,7 @@ export const Mesas = () => {
                             </svg>
                         </span>
                     </div>
-                    <select 
+                    <select
                         className="w-full px-3 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-orange-200"
                         value={filterStatus}
                         onChange={(e) => setFilterStatus(e.target.value)}
@@ -64,74 +92,77 @@ export const Mesas = () => {
                 </div>
             </div>
 
-            {/* TABLA */}
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            {/* TABLA DE SUCURSALES */}
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                             <tr>
-                                <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
-                                    ID Mesa
-                                </th>
-                                <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
-                                    Sucursal
-                                </th>
-                                <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
-                                    Capacidad
-                                </th>
-                                <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
-                                    Atendido por
-                                </th>
-                                <th scope="col" className="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
-                                    Estado
-                                </th>
-                                <th scope="col" className="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">
-                                    Acciones
-                                </th>
+                                <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Capacidad</th>
+                                <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Direccion Sucursal</th>
+                                <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Empleado</th>
+                                <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Disponibilidad</th>
+                                <th scope="col" className="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Acciones</th>
                             </tr>
                         </thead>
 
-                        <tbody className="bg-white divide-y divide-gray-200">
+                        <tbody className="bg-white divide-y divide-gray-100">
                             {mesas.length === 0 ? (
                                 <tr>
-                                    <td colSpan="6" className="px-6 py-10 text-center text-gray-500 italic">
-                                        No se encontraron mesas configuradas.
+                                    <td colSpan="6" className="px-6 py-12 text-center text-gray-400">
+                                        No hay sucursales registradas en el sistema.
                                     </td>
                                 </tr>
                             ) : (
                                 mesas.map((m) => (
-                                    <tr key={m.id} className="hover:bg-gray-50 transition-colors">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-blue-600">
-                                            {m.id}
+                                    <tr key={m.id} className="hover:bg-gray-50/50 transition-colors">
+                                        {/* Nombre con ID pequeño */}
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <div className="text-sm font-bold text-gray-900">{m.capacity}</div>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                            {m.branch}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                            <div className="flex items-center gap-1">
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
-                                                </svg>
-                                                {m.capacity} Personas
+
+                                        {/* Dirección con truncado inteligente */}
+                                        <td className="px-6 py-4 max-w-xs">
+                                            <div className="text-sm text-gray-600 truncate" title={m.branch}>
+                                                {m.branch}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                            {m.employee}
+
+                                        {/* Empleado asignado */}
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <div className="text-sm font-bold text-gray-900">{m.employee}</div>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-center">
-                                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                                                m.availability 
-                                                ? "bg-green-100 text-green-700" 
+
+                                        {/* Disponibilidad */}
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <span className={`px-3 py-1 rounded-full text-xs font-bold ${m.availability
+                                                ? "bg-green-100 text-green-700"
                                                 : "bg-red-100 text-red-700"
-                                            }`}>
-                                                <span className={`h-2 w-2 rounded-full mr-2 ${m.availability ? "bg-green-500" : "bg-red-500"}`}></span>
+                                                }`}>
                                                 {m.availability ? "Disponible" : "Ocupada"}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <button className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none transition">
-                                                Editar
-                                            </button>
+
+                                        {/* Acciones */}
+                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
+                                            <div className="flex justify-end gap-2">
+                                                <button 
+                                                    onClick={() => handleOpenModal(m)}
+                                                    className="p-2 text-gray-400 hover:text-indigo-600 transition-colors"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                    </svg>
+                                                </button>
+                                                <button 
+                                                    onClick={() => handleOpenDeleteModal(m)}
+                                                    className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))
@@ -140,42 +171,36 @@ export const Mesas = () => {
                     </table>
                 </div>
 
-                {/* PAGINACIÓN */}
-                <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-                    <div className="flex-1 flex justify-between sm:hidden">
-                        <button className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                            Anterior
-                        </button>
-                        <button className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                            Siguiente
-                        </button>
+                {/* FOOTER / PAGINACIÓN */}
+                <div className="bg-gray-50 px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+                    <div className="text-xs text-gray-500 font-medium">
+                        Total: <span className="text-gray-800">{mesas.length} mesas</span> registradas
                     </div>
-                    <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                        <div>
-                            <p className="text-sm text-gray-700">
-                                Mostrando <span className="font-medium">1</span> a <span className="font-medium">{mesas.length}</span> de <span className="font-medium">{mesas.length}</span> resultados
-                            </p>
-                        </div>
-                        <div>
-                            <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                                <button className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                                    <span className="sr-only">Anterior</span>
-                                    <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
-                                    </svg>
-                                </button>
-                                <button className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"> 1 </button>
-                                <button className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                                    <span className="sr-only">Siguiente</span>
-                                    <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                                    </svg>
-                                </button>
-                            </nav>
-                        </div>
+                    <div className="flex gap-2">
+                        <button className="p-2 border border-gray-200 rounded bg-white text-gray-400 hover:bg-gray-50 disabled:opacity-50" disabled>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </button>
+                        <button className="p-2 border border-gray-200 rounded bg-white text-gray-600 hover:bg-gray-50">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
                     </div>
                 </div>
             </div>
+            <MesasModal 
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                mesa={selectedMesa}
+            />
+            <MesasModalDelete
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={handleConfirmDelete}
+                mesa={selectedMesa}
+            />
         </div>
     );
 };
