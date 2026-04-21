@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { SucursalesModal } from './sucursalesModal';
+import { SucursalesModalDelete } from './sucursalesModalDelete';
 
 /**
  * Componente para la administración de Sucursales.
@@ -7,41 +9,61 @@ import React, { useState } from 'react';
 export const Sucursales = () => {
     // Datos temporales basados en el esquema de Sucursales
     const [sucursales, setSucursales] = useState([
-        { 
-            id: "65f1a2b3c4d5e6f7a8b90123", 
-            nombre: "Sucursal Central - La Reformita", 
-            direccion: "Av. Petapa 32-01, Zona 12, Ciudad de Guatemala", 
-            telefono: "+502 2233-4455", 
+        {
+            id: "65f1a2b3c4d5e6f7a8b90123",
+            nombre: "Sucursal Central - La Reformita",
+            direccion: "Av. Petapa 32-01, Zona 12, Ciudad de Guatemala",
+            telefono: "+502 2233-4455",
             horario: { apertura: "07:00", cierre: "22:00" },
-            isActive: true 
+            isActive: true
         },
-        { 
-            id: "65f1a2b3c4d5e6f7a8b90124", 
-            nombre: "Express Zona 10", 
-            direccion: "10ma Calle 5-50, Zona 10, Edificio Plaza", 
-            telefono: "+502 2211-0099", 
+        {
+            id: "65f1a2b3c4d5e6f7a8b90124",
+            nombre: "Express Zona 10",
+            direccion: "10ma Calle 5-50, Zona 10, Edificio Plaza",
+            telefono: "+502 2211-0099",
             horario: { apertura: "08:00", cierre: "20:00" },
-            isActive: true 
+            isActive: true
         },
-        { 
-            id: "65f1a2b3c4d5e6f7a8b90125", 
-            nombre: "San Cristóbal", 
-            direccion: "Boulevard Principal 12-44, Sector A-3", 
-            telefono: "+502 2478-1122", 
+        {
+            id: "65f1a2b3c4d5e6f7a8b90125",
+            nombre: "San Cristóbal",
+            direccion: "Boulevard Principal 12-44, Sector A-3",
+            telefono: "+502 2478-1122",
             horario: { apertura: "07:00", cierre: "21:00" },
-            isActive: false 
+            isActive: false
         },
-        { 
-            id: "65f1a2b3c4d5e6f7a8b90126", 
-            nombre: "Pradera Concepción", 
-            direccion: "KM 15.5 Carretera a El Salvador, Local 45", 
-            telefono: "+502 6633-8877", 
+        {
+            id: "65f1a2b3c4d5e6f7a8b90126",
+            nombre: "Pradera Concepción",
+            direccion: "KM 15.5 Carretera a El Salvador, Local 45",
+            telefono: "+502 6633-8877",
             horario: { apertura: "10:00", cierre: "21:00" },
-            isActive: true 
+            isActive: true
         }
     ]);
 
     const [searchTerm, setSearchTerm] = useState("");
+
+    // Modal State
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [selectedSucursal, setSelectedSucursal] = useState(null);
+
+    const handleOpenModal = (sucursal = null) => {
+        setSelectedSucursal(sucursal);
+        setIsModalOpen(true);
+    };
+
+    const handleOpenDeleteModal = (sucursal) => {
+        setSelectedSucursal(sucursal);
+        setIsDeleteModalOpen(true);
+    };
+
+    const handleConfirmDelete = () => {
+        // En una implementación real, aquí se llamaría a la API
+        console.log("Deleted sucursal:", selectedSucursal?.nombre);
+    };
 
     return (
         <div className="p-4 md:p-6 bg-gray-50 min-h-screen font-sans">
@@ -54,7 +76,10 @@ export const Sucursales = () => {
                     </p>
                 </div>
 
-                <button className="bg-orange-400 px-5 py-2.5 rounded-lg text-white font-semibold shadow-md hover:bg-indigo-700 transition-all flex items-center justify-center gap-2">
+                <button 
+                    onClick={() => handleOpenModal()}
+                    className="bg-orange-400 px-5 py-2.5 rounded-lg text-white font-semibold shadow-md hover:bg-indigo-700 transition-all flex items-center justify-center gap-2"
+                >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
                     </svg>
@@ -110,7 +135,7 @@ export const Sucursales = () => {
                                             <div className="text-sm font-bold text-gray-900">{s.nombre}</div>
                                             <div className="text-[10px] text-gray-400 font-mono mt-1 uppercase tracking-tighter">ID: {s.id.substring(0, 8)}...</div>
                                         </td>
-                                        
+
                                         {/* Dirección con truncado inteligente */}
                                         <td className="px-6 py-4 max-w-xs">
                                             <div className="text-sm text-gray-600 truncate" title={s.direccion}>
@@ -140,24 +165,29 @@ export const Sucursales = () => {
 
                                         {/* Estado isActive */}
                                         <td className="px-6 py-4 whitespace-nowrap text-center">
-                                            <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                                                s.isActive 
-                                                ? "bg-emerald-100 text-emerald-700" 
+                                            <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${s.isActive
+                                                ? "bg-emerald-100 text-emerald-700"
                                                 : "bg-slate-100 text-slate-500"
-                                            }`}>
-                                                {s.isActive ? "Activa" : "Inactiva"}
+                                                }`}>
+                                                {s.isActive ? "Abierta" : "Cerrada"}
                                             </span>
                                         </td>
 
                                         {/* Acciones */}
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
                                             <div className="flex justify-end gap-2">
-                                                <button className="p-2 text-gray-400 hover:text-indigo-600 transition-colors">
+                                                <button 
+                                                    onClick={() => handleOpenModal(s)}
+                                                    className="p-2 text-gray-400 hover:text-indigo-600 transition-colors"
+                                                >
                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                                     </svg>
                                                 </button>
-                                                <button className="p-2 text-gray-400 hover:text-red-500 transition-colors">
+                                                <button 
+                                                    onClick={() => handleOpenDeleteModal(s)}
+                                                    className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                                                >
                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                     </svg>
@@ -190,6 +220,17 @@ export const Sucursales = () => {
                     </div>
                 </div>
             </div>
+            <SucursalesModal 
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                sucursal={selectedSucursal}
+            />
+            <SucursalesModalDelete
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={handleConfirmDelete}
+                sucursal={selectedSucursal}
+            />
         </div>
     );
 };
