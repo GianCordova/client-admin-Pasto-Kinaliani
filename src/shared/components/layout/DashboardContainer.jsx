@@ -13,6 +13,7 @@ export const DashboardContainer = () => {
       case "welcome":
         return (
           <div className="flex flex-col items-center justify-center h-full text-center">
+            <img src="./src/assets/img/pastor_kinaliani_2.png" alt="Logo" className="w-64 h-64 mb-4 rounded-lg shadow-lg" />
             <h1 className="text-4xl font-bold text-gray-700 mb-4">
               Bienvenido a Pasto Kinaliani
             </h1>
