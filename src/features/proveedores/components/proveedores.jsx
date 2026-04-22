@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+// Ajustado a tu nombre de componente
+import { ProveedoresForm } from './proveedoresForm'; 
+import { ProveedoresModalDelete } from './proveedoresModalDelete.jsx';
 
 /**
  * Componente para la administración de Proveedores.
@@ -38,6 +41,26 @@ export const Proveedores = () => {
 
     const [searchTerm, setSearchTerm] = useState("");
 
+    // Modal State
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [selectedProveedor, setSelectedProveedor] = useState(null);
+
+    const handleOpenModal = (proveedor = null) => {
+        setSelectedProveedor(proveedor);
+        setIsModalOpen(true);
+    };
+
+    const handleOpenDeleteModal = (proveedor) => {
+        setSelectedProveedor(proveedor);
+        setIsDeleteModalOpen(true);
+    };
+
+    const handleConfirmDelete = () => {
+        console.log("Deleted proveedor:", selectedProveedor?.nombre);
+        setIsDeleteModalOpen(false);
+    };
+
     // Filtro básico por nombre, apellido o DPI
     const filteredProveedores = proveedores.filter(p => 
         p.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -56,7 +79,10 @@ export const Proveedores = () => {
                     </p>
                 </div>
 
-                <button className="bg-orange-400 px-5 py-2.5 rounded-lg text-white font-semibold shadow-md hover:bg-indigo-700 transition-all flex items-center justify-center gap-2">
+                <button 
+                    onClick={() => handleOpenModal()}
+                    className="bg-orange-400 px-5 py-2.5 rounded-lg text-white font-semibold shadow-md hover:bg-indigo-700 transition-all flex items-center justify-center gap-2"
+                >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
                     </svg>
@@ -106,18 +132,15 @@ export const Proveedores = () => {
                             ) : (
                                 filteredProveedores.map((p) => (
                                     <tr key={p.id} className="hover:bg-gray-50/50 transition-colors">
-                                        {/* Nombre y Apellido */}
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="text-sm font-bold text-gray-900">{p.nombre} {p.apellido}</div>
                                             <div className="text-[10px] text-gray-400 font-mono mt-1 uppercase tracking-tighter">ID: {p.id.substring(0, 8)}...</div>
                                         </td>
                                         
-                                        {/* DPI */}
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-medium">
                                             {p.dpi}
                                         </td>
 
-                                        {/* Contacto (Teléfono y Correo) */}
                                         <td className="px-6 py-4">
                                             <div className="flex flex-col gap-1">
                                                 <div className="text-sm text-gray-600 flex items-center gap-2">
@@ -135,7 +158,6 @@ export const Proveedores = () => {
                                             </div>
                                         </td>
 
-                                        {/* Estado isActive */}
                                         <td className="px-6 py-4 whitespace-nowrap text-center">
                                             <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                                                 p.isActive 
@@ -146,15 +168,22 @@ export const Proveedores = () => {
                                             </span>
                                         </td>
 
-                                        {/* Acciones */}
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
                                             <div className="flex justify-end gap-2">
-                                                <button className="p-2 text-gray-400 hover:text-indigo-600 transition-colors" title="Editar">
+                                                <button 
+                                                    onClick={() => handleOpenModal(p)}
+                                                    className="p-2 text-gray-400 hover:text-indigo-600 transition-colors" 
+                                                    title="Editar"
+                                                >
                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                                     </svg>
                                                 </button>
-                                                <button className="p-2 text-gray-400 hover:text-red-500 transition-colors" title="Eliminar">
+                                                <button 
+                                                    onClick={() => handleOpenDeleteModal(p)}
+                                                    className="p-2 text-gray-400 hover:text-red-500 transition-colors" 
+                                                    title="Eliminar"
+                                                >
                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                     </svg>
@@ -175,6 +204,19 @@ export const Proveedores = () => {
                     </div>
                 </div>
             </div>
+
+            {/* MODALES - Aquí usamos ProveedoresForm */}
+            <ProveedoresForm 
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                proveedor={selectedProveedor}
+            />
+            <ProveedoresModalDelete
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={handleConfirmDelete}
+                proveedor={selectedProveedor}
+            />
         </div>
     );
 };

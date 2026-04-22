@@ -1,136 +1,189 @@
-import { useState } from "react";
+import React, { useState, useEffect } from 'react';
 
-export const ProveedoresForm = () => {
-  const [form, setForm] = useState({
-    nombre: "",
-    apellido: "",
-    dpi: "",
-    telefono: "",
-    correo: "",
-    isActive: true
-  });
+export const ProveedoresForm = ({ isOpen, onClose, proveedor }) => {
+    const isEdit = !!proveedor;
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setForm({
-      ...form,
-      // Manejo especial para el checkbox de estado activo
-      [name]: type === "checkbox" ? checked : value
+    const [form, setForm] = useState({
+        nombre: "",
+        apellido: "",
+        dpi: "",
+        telefono: "",
+        correo: "",
+        isActive: true
     });
-  };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Aquí validas y envías a tu API de Express/Mongoose
-    console.log("Datos enviados:", form);
-  };
+    // Efecto para cargar datos cuando se abre el modal (Editar o Nuevo)
+    useEffect(() => {
+        if (proveedor && isOpen) {
+            setForm({
+                nombre: proveedor.nombre || '',
+                apellido: proveedor.apellido || '',
+                dpi: proveedor.dpi || '',
+                telefono: proveedor.telefono || '',
+                correo: proveedor.correo || '',
+                isActive: proveedor.isActive ?? true
+            });
+        } else if (!proveedor && isOpen) {
+            setForm({
+                nombre: '',
+                apellido: '',
+                dpi: '',
+                telefono: '',
+                correo: '',
+                isActive: true
+            });
+        }
+    }, [proveedor, isOpen]);
 
-  return (
-    <div className="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Registro de Proveedor</h2>
-      
-      <form onSubmit={handleSubmit} className="space-y-4">
-        
-        {/* Fila: Nombre y Apellido */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-            <input
-              name="nombre"
-              type="text"
-              required
-              placeholder="Ej. Juan"
-              onChange={handleChange}
-              className="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none transition-all"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Apellido</label>
-            <input
-              name="apellido"
-              type="text"
-              required
-              placeholder="Ej. Pérez"
-              onChange={handleChange}
-              className="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none transition-all"
-            />
-          </div>
+    // Si el modal no está abierto, no renderiza nada
+    if (!isOpen) return null;
+
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setForm(prev => ({
+            ...prev,
+            [name]: type === "checkbox" ? checked : value
+        }));
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        // Aquí validas y envías a tu API de Express/Mongoose
+        console.log("Datos guardados:", form);
+        onClose(); // Cierra el modal después de guardar
+    };
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden animate-In">
+                
+                {/* Header Modal (Siguiendo el estilo de Sucursales) */}
+                <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                    <h2 className="text-xl font-bold text-gray-800">
+                        {isEdit ? 'Editar Proveedor' : 'Nuevo Proveedor'}
+                    </h2>
+                    <button 
+                        onClick={onClose}
+                        className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-md hover:bg-gray-200"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                {/* Form Body */}
+                <form onSubmit={handleSubmit} className="p-6">
+                    <div className="space-y-4">
+                        
+                        {/* Fila: Nombre y Apellido */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                                <input
+                                    name="nombre"
+                                    type="text"
+                                    required
+                                    value={form.nombre}
+                                    placeholder="Ej. Juan"
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-200 focus:border-orange-400 outline-none transition-colors"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Apellido</label>
+                                <input
+                                    name="apellido"
+                                    type="text"
+                                    required
+                                    value={form.apellido}
+                                    placeholder="Ej. Pérez"
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-200 focus:border-orange-400 outline-none transition-colors"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Campo: DPI */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">DPI (13 dígitos)</label>
+                            <input
+                                name="dpi"
+                                type="text"
+                                required
+                                maxLength="13"
+                                minLength="13"
+                                value={form.dpi}
+                                placeholder="2541 00000 0101"
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-200 focus:border-orange-400 outline-none transition-colors"
+                            />
+                        </div>
+
+                        {/* Fila: Teléfono y Correo */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                                <input
+                                    name="telefono"
+                                    type="tel"
+                                    required
+                                    value={form.telefono}
+                                    placeholder="5544-3322"
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-200 focus:border-orange-400 outline-none transition-colors"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
+                                <input
+                                    name="correo"
+                                    type="email"
+                                    required
+                                    value={form.correo}
+                                    placeholder="proveedor@empresa.com"
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-200 focus:border-orange-400 outline-none transition-colors"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Estado Activo (Toggle Switch) */}
+                        <div className="flex items-center p-2 bg-gray-50 rounded-lg">
+                            <label className="relative inline-flex items-center cursor-pointer gap-3">
+                                <input
+                                    type="checkbox"
+                                    name="isActive"
+                                    className="sr-only peer"
+                                    checked={form.isActive}
+                                    onChange={handleChange}
+                                />
+                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-400"></div>
+                                <span className="text-sm font-medium text-gray-700">Proveedor Activo</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    {/* Botones de Acción */}
+                    <div className="mt-8 flex justify-end gap-3">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="px-5 py-2.5 text-gray-600 bg-gray-100 hover:bg-gray-200 font-medium rounded-lg transition-colors"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            type="submit"
+                            className="px-5 py-2.5 bg-orange-400 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors shadow-sm"
+                        >
+                            {isEdit ? 'Guardar Cambios' : 'Crear Proveedor'}
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-
-        {/* Campo: DPI (Validación de 13 dígitos según tu esquema) */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">DPI (13 dígitos)</label>
-          <input
-            name="dpi"
-            type="text"
-            required
-            maxLength="13"
-            minLength="13"
-            placeholder="2541 00000 0101"
-            onChange={handleChange}
-            className="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none transition-all"
-          />
-        </div>
-
-        {/* Fila: Teléfono y Correo */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
-            <input
-              name="telefono"
-              type="tel"
-              required
-              placeholder="5544-3322"
-              onChange={handleChange}
-              className="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none transition-all"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
-            <input
-              name="correo"
-              type="email"
-              required
-              placeholder="proveedor@empresa.com"
-              onChange={handleChange}
-              className="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none transition-all"
-            />
-          </div>
-        </div>
-
-        {/* Estado Activo */}
-        <div className="flex items-center p-2 bg-gray-50 rounded-lg">
-          <label className="relative inline-flex items-center cursor-pointer gap-3">
-            <input
-              type="checkbox"
-              name="isActive"
-              className="sr-only peer"
-              checked={form.isActive}
-              onChange={handleChange}
-            />
-            {/* Toggle Switch Visual */}
-            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
-            <span className="text-sm font-medium text-gray-700">Proveedor Activo</span>
-          </label>
-        </div>
-
-        {/* Botones de Acción */}
-        <div className="flex gap-3 pt-4">
-          <button
-            type="submit"
-            className="flex-1 bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-700 shadow-md transition-all active:scale-95"
-          >
-            Guardar Proveedor
-          </button>
-          <button
-            type="button"
-            className="px-6 py-3 border border-gray-300 text-gray-600 rounded-xl hover:bg-gray-100 transition-all"
-          >
-            Cancelar
-          </button>
-        </div>
-
-      </form>
-    </div>
-  );
+    );
 };
+
+export default ProveedoresForm;
