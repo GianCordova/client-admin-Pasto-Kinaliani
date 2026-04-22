@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Navbar } from "./Navbar";
 import { Sidebar } from "./Sidebar";
-import { PlatillosPage } from "../../../features/platillos/pages/platillosPage.jsx";
+import { Platillos } from "../../../features/platillos/components/platillos.jsx";
 import { Proveedores } from "../../../features/proveedores/components/proveedores.jsx";
 export const DashboardContainer = () => {
  
@@ -23,7 +23,7 @@ export const DashboardContainer = () => {
         return <PedidosPage />;
  
       case "Platillos":
-        return <PlatillosPage />;
+        return <Platillos />;
  
       case "Proveedores":
         return <Proveedores />;
