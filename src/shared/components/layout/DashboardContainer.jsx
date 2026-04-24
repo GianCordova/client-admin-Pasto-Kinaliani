@@ -2,6 +2,7 @@ import { useState } from "react"; // 1. Importamos useState
 import { Navbar } from "./Navbar";
 import { Sidebar } from "./Sidebar";
 import { Ventas } from "../../../features/ventas/components/ventas"; // 2. Importa tu componente
+import {Inventario} from "../../../features/inventario/components/inventario";
 
 export const DashboardContainer = () => {
   // 3. Estado para controlar qué componente se ve
@@ -24,6 +25,8 @@ export const DashboardContainer = () => {
 
       case "Ventas":
         return <Ventas />;
+      case "Inventario":
+        return <Inventario/>;
 
       default:
         return <h2>Vista no encontrada</h2>;
