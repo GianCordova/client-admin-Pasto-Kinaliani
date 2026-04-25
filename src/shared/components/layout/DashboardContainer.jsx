@@ -1,8 +1,17 @@
 import { useState } from "react";
 import { Navbar } from "./Navbar";
 import { Sidebar } from "./Sidebar";
-import { ReservacionesCards } from "../../../features/reservaciones/components/Reservaciones.jsx";
-import { PedidosCards } from "../../../features/pedidos/components/Pedidos.jsx";
+import { Reservaciones } from "../../../features/reservaciones/components/Reservaciones.jsx";
+import { Pedidos } from "../../../features/pedidos/components/Pedidos.jsx";
+import { Empleados } from "../../../features/empleados/components/Empleados.jsx";
+import { Inventario } from "../../../features/inventario/components/Inventario.jsx";
+import { Mesas } from "../../../features/mesas/components/Mesas.jsx";
+import { Platillos } from "../../../features/platillos/components/Platillos.jsx";
+import { Proveedores } from "../../../features/proveedores/components/Proveedores.jsx";
+import { Sucursales } from "../../../features/sucursales/components/Sucursales.jsx";
+import { Usuarios } from "../../../features/usuarios/components/Usuarios.jsx";
+import { Ventas } from "../../../features/ventas/components/Ventas.jsx";
+
 
 export const DashboardContainer = () => {
 
@@ -12,34 +21,34 @@ export const DashboardContainer = () => {
     switch (view) {
 
       case "Empleados":
-        return <EmpleadosPage />;
+        return <Empleados />;
 
       case "Inventario":
-        return <InventarioPage />;
+        return <Inventario />;
 
       case "Mesas":
-        return <MesasPage />;
+        return <Mesas />;
 
       case "Pedidos":
-        return <PedidosCards />;
+        return <Pedidos />;
 
       case "Platillos":
-        return <PlatillosPage />;
+        return <Platillos />;
 
       case "Proveedores":
-        return <ProveedoresPage />;
+        return <Proveedores />;
 
       case "Reservaciones":
-        return <ReservacionesCards />;
+        return <Reservaciones />;
 
       case "Sucursales":
-        return <SucursalesPage />;
+        return <Sucursales />;
 
       case "Usuarios":
-        return <UsuariosPage />;
+        return <Usuarios />;
 
       case "Ventas":
-        return <VentasPage />;
+        return <Ventas />;
 
       case "welcome":
         return (
