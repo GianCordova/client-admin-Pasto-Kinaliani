@@ -4,13 +4,13 @@ import { Sidebar } from "./Sidebar";
 import { Reservaciones } from "../../../features/reservaciones/components/Reservaciones.jsx";
 import { Pedidos } from "../../../features/pedidos/components/Pedidos.jsx";
 import { Empleados } from "../../../features/empleados/components/Empleados.jsx";
-import { Inventario } from "../../../features/inventario/components/Inventario.jsx";
-import { Mesas } from "../../../features/mesas/components/Mesas.jsx";
-import { Platillos } from "../../../features/platillos/components/Platillos.jsx";
-import { Proveedores } from "../../../features/proveedores/components/Proveedores.jsx";
-import { Sucursales } from "../../../features/sucursales/components/Sucursales.jsx";
+import { Inventario } from "../../../features/inventario/components/inventario.jsx";
+import { Mesas } from "../../../features/mesas/components/mesas.jsx";
+import { Platillos } from "../../../features/platillos/components/platillos.jsx";
+import { Proveedores } from "../../../features/proveedores/components/proveedores.jsx";
+import { Sucursales } from "../../../features/sucursales/components/sucursales.jsx";
 import { Usuarios } from "../../../features/usuarios/components/Usuarios.jsx";
-import { Ventas } from "../../../features/ventas/components/Ventas.jsx";
+import { Ventas } from "../../../features/ventas/components/ventas.jsx";
 
 
 export const DashboardContainer = () => {
