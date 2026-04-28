@@ -1,28 +1,33 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
 export const EmpleadosModal = ({ isOpen, onClose, empleado }) => {
     const isEdit = !!empleado;
 
     const [formData, setFormData] = useState({
-        id: '',
-        name: '',
-        surname: '',
-        role: 'Mesero',
-        branch: 'La Reformita',
-        status: true
+        id: "",
+        name: "",
+        surname: "",
+        role: "Mesero",
+        branch: "La Reformita",
+        status: true,
+        image: null
     });
 
     useEffect(() => {
         if (empleado && isOpen) {
-            setFormData({ ...empleado });
+            setFormData({
+                ...empleado,
+                image: null
+            });
         } else if (!empleado && isOpen) {
             setFormData({
-                id: '',
-                name: '',
-                surname: '',
-                role: 'Mesero',
-                branch: 'La Reformita',
-                status: true
+                id: "",
+                name: "",
+                surname: "",
+                role: "Mesero",
+                branch: "La Reformita",
+                status: true,
+                image: null
             });
         }
     }, [empleado, isOpen]);
@@ -30,79 +35,167 @@ export const EmpleadosModal = ({ isOpen, onClose, empleado }) => {
     if (!isOpen) return null;
 
     const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setFormData(prev => ({
+        const { name, value, type, checked, files } = e.target;
+
+        setFormData((prev) => ({
             ...prev,
-            [name]: type === 'checkbox' ? checked : value
+            [name]:
+                type === "checkbox"
+                    ? checked
+                    : type === "file"
+                        ? files[0]
+                        : value
         }));
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log("Guardando empleado...", formData);
+
+        const form = new FormData();
+
+        form.append("id", formData.id);
+        form.append("name", formData.name);
+        form.append("surname", formData.surname);
+        form.append("role", formData.role);
+        form.append("branch", formData.branch);
+        form.append("status", formData.status);
+
+        if (formData.image) {
+            form.append("image", formData.image);
+        }
+
+        console.log("EMPLOYEE DATA:", Object.fromEntries(form.entries()));
+
         onClose();
     };
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+
             <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden">
+
+                {/* HEADER */}
                 <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                     <h2 className="text-xl font-bold text-gray-800">
-                        {isEdit ? 'Editar Empleado' : 'Nuevo Empleado'}
+                        {isEdit ? "Editar Empleado" : "Nuevo Empleado"}
                     </h2>
-                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1 rounded-md hover:bg-gray-200 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
+
+                    <button
+                        onClick={onClose}
+                        className="text-gray-400 hover:text-gray-600"
+                    >
+                        ✕
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-6">
-                    <div className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-                                <input type="text" name="name" value={formData.name} onChange={handleChange} required className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-200 focus:border-orange-400 outline-none" />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Apellido</label>
-                                <input type="text" name="surname" value={formData.surname} onChange={handleChange} required className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-200 focus:border-orange-400 outline-none" />
-                            </div>
-                        </div>
+                {/* FORM */}
+                <form onSubmit={handleSubmit} className="p-6 space-y-4">
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Puesto</label>
-                                <select name="role" value={formData.role} onChange={handleChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none">
-                                    <option value="Mesero">Mesero</option>
-                                    <option value="Chef">Chef</option>
-                                    <option value="Bartender">Bartender</option>
-                                    <option value="Gerente">Gerente</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Sucursal</label>
-                                <select name="branch" value={formData.branch} onChange={handleChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none">
-                                    <option value="La Reformita">La Reformita</option>
-                                    <option value="Zona 10">Zona 10</option>
-                                    <option value="San Cristóbal">San Cristóbal</option>
-                                </select>
-                            </div>
-                        </div>
+                    {/* FOTO */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Foto del Empleado
+                        </label>
 
-                        <div className="flex items-center gap-2 pt-2">
-                            <input type="checkbox" id="status" name="status" checked={formData.status} onChange={handleChange} className="w-4 h-4 text-orange-500 rounded focus:ring-orange-400 border-gray-300" />
-                            <label htmlFor="status" className="text-sm font-medium text-gray-700">En Turno / Activo</label>
-                        </div>
+                        <input
+                            type="file"
+                            name="image"
+                            accept="image/*"
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 bg-gray-50 border rounded-lg"
+                        />
+
+                        {/* PREVIEW */}
+                        {formData.image && (
+                            <img
+                                src={URL.createObjectURL(formData.image)}
+                                alt="preview"
+                                className="mt-3 w-24 h-24 object-cover rounded-full border"
+                            />
+                        )}
                     </div>
 
-                    <div className="mt-8 flex justify-end gap-3">
-                        <button type="button" onClick={onClose} className="px-5 py-2.5 text-gray-600 bg-gray-100 hover:bg-gray-200 font-medium rounded-lg">Cancelar</button>
-                        <button type="submit" className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg shadow-sm">
-                            {isEdit ? 'Actualizar Colaborador' : 'Registrar Empleado'}
+                    {/* NOMBRE Y APELLIDO */}
+                    <div className="grid grid-cols-2 gap-4">
+
+                        <input
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            className="px-4 py-2 border rounded-lg bg-gray-50"
+                            placeholder="Nombre"
+                        />
+
+                        <input
+                            name="surname"
+                            value={formData.surname}
+                            onChange={handleChange}
+                            className="px-4 py-2 border rounded-lg bg-gray-50"
+                            placeholder="Apellido"
+                        />
+                    </div>
+
+                    {/* PUESTO Y SUCURSAL */}
+                    <div className="grid grid-cols-2 gap-4">
+
+                        <select
+                            name="role"
+                            value={formData.role}
+                            onChange={handleChange}
+                            className="px-4 py-2 border rounded-lg bg-gray-50"
+                        >
+                            <option>Mesero</option>
+                            <option>Chef</option>
+                            <option>Bartender</option>
+                            <option>Gerente</option>
+                        </select>
+
+                        <select
+                            name="branch"
+                            value={formData.branch}
+                            onChange={handleChange}
+                            className="px-4 py-2 border rounded-lg bg-gray-50"
+                        >
+                            <option>La Reformita</option>
+                            <option>Zona 10</option>
+                            <option>San Cristóbal</option>
+                        </select>
+
+                    </div>
+
+                    {/* STATUS */}
+                    <label className="flex items-center gap-2">
+                        <input
+                            type="checkbox"
+                            name="status"
+                            checked={formData.status}
+                            onChange={handleChange}
+                        />
+                        Activo / En turno
+                    </label>
+
+                    {/* BOTONES */}
+                    <div className="flex justify-end gap-3 pt-4">
+
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="px-4 py-2 bg-gray-200 rounded-lg"
+                        >
+                            Cancelar
                         </button>
+
+                        <button
+                            type="submit"
+                            className="px-4 py-2 bg-orange-500 text-white rounded-lg"
+                        >
+                            {isEdit ? "Actualizar" : "Registrar"}
+                        </button>
+
                     </div>
+
                 </form>
+
             </div>
         </div>
     );
