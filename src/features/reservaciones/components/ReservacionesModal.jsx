@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { useReservationsStore } from "../hooks/useReservationsStore";
 
 export const ReservacionesForm = ({ isOpen, onClose, reservacion }) => {
-
   const isEdit = !!reservacion;
+
+  const { createReservation, updateReservation } = useReservationsStore();
 
   const [form, setForm] = useState({
     id_usuario: "",
@@ -10,19 +12,19 @@ export const ReservacionesForm = ({ isOpen, onClose, reservacion }) => {
     hora: "",
     numero_personas: "",
     numero_mesas: "",
-    estado: "pendiente"
+    estado: "pendiente",
   });
 
   // 🔥 Cargar datos cuando es editar
   useEffect(() => {
     if (reservacion && isOpen) {
       setForm({
-        id_usuario: reservacion.id_usuario || "",
+        id_usuario: reservacion.id_usuario?._id || reservacion.id_usuario || "",
         fecha: reservacion.fecha || "",
         hora: reservacion.hora || "",
         numero_personas: reservacion.numero_personas || "",
         numero_mesas: reservacion.numero_mesas || "",
-        estado: reservacion.estado || "pendiente"
+        estado: reservacion.estado || "pendiente",
       });
     } else if (!reservacion && isOpen) {
       setForm({
@@ -31,7 +33,7 @@ export const ReservacionesForm = ({ isOpen, onClose, reservacion }) => {
         hora: "",
         numero_personas: "",
         numero_mesas: "",
-        estado: "pendiente"
+        estado: "pendiente",
       });
     }
   }, [reservacion, isOpen]);
@@ -40,32 +42,34 @@ export const ReservacionesForm = ({ isOpen, onClose, reservacion }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log("Datos:", form);
-
-    // 🔥 aquí conectas tu API luego
-    onClose();
+    try {
+      if (isEdit) {
+        await updateReservation(reservacion._id, form);
+      } else {
+        await createReservation(form);
+      }
+      onClose();
+    } catch (error) {
+      console.error("Error al guardar reservación:", error);
+    }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden">
-
         <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
           <h2 className="text-xl font-bold text-gray-800">
             {isEdit ? "Editar Reservación" : "Nueva Reservación"}
           </h2>
-
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition p-1 rounded hover:bg-gray-200"
@@ -75,12 +79,10 @@ export const ReservacionesForm = ({ isOpen, onClose, reservacion }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Usuario */}
             <div className="md:col-span-2">
-              <label className="text-sm font-medium text-gray-700">
-                Usuario
-              </label>
+              <label className="text-sm font-medium text-gray-700">Usuario</label>
               <input
                 name="id_usuario"
                 value={form.id_usuario}
@@ -93,9 +95,7 @@ export const ReservacionesForm = ({ isOpen, onClose, reservacion }) => {
 
             {/* Fecha */}
             <div>
-              <label className="text-sm font-medium text-gray-700">
-                Fecha
-              </label>
+              <label className="text-sm font-medium text-gray-700">Fecha</label>
               <input
                 type="date"
                 name="fecha"
@@ -108,9 +108,7 @@ export const ReservacionesForm = ({ isOpen, onClose, reservacion }) => {
 
             {/* Hora */}
             <div>
-              <label className="text-sm font-medium text-gray-700">
-                Hora
-              </label>
+              <label className="text-sm font-medium text-gray-700">Hora</label>
               <input
                 type="time"
                 name="hora"
@@ -121,11 +119,9 @@ export const ReservacionesForm = ({ isOpen, onClose, reservacion }) => {
               />
             </div>
 
-            {/* Personas */}
+            {/* Número de personas */}
             <div>
-              <label className="text-sm font-medium text-gray-700">
-                Número de personas
-              </label>
+              <label className="text-sm font-medium text-gray-700">Número de personas</label>
               <input
                 type="number"
                 name="numero_personas"
@@ -136,11 +132,9 @@ export const ReservacionesForm = ({ isOpen, onClose, reservacion }) => {
               />
             </div>
 
-            {/* Mesas */}
+            {/* Número de mesas */}
             <div>
-              <label className="text-sm font-medium text-gray-700">
-                Número de mesas
-              </label>
+              <label className="text-sm font-medium text-gray-700">Número de mesas</label>
               <input
                 type="number"
                 name="numero_mesas"
@@ -153,9 +147,7 @@ export const ReservacionesForm = ({ isOpen, onClose, reservacion }) => {
 
             {/* Estado */}
             <div className="md:col-span-2">
-              <label className="text-sm font-medium text-gray-700">
-                Estado
-              </label>
+              <label className="text-sm font-medium text-gray-700">Estado</label>
               <select
                 name="estado"
                 value={form.estado}
@@ -167,12 +159,10 @@ export const ReservacionesForm = ({ isOpen, onClose, reservacion }) => {
                 <option value="cancelada">Cancelada</option>
               </select>
             </div>
-
           </div>
 
-          {/* BOTONES */}
+          {/* Botones */}
           <div className="mt-6 flex justify-end gap-3">
-
             <button
               type="button"
               onClick={onClose}
@@ -180,18 +170,14 @@ export const ReservacionesForm = ({ isOpen, onClose, reservacion }) => {
             >
               Cancelar
             </button>
-
             <button
               type="submit"
               className="px-5 py-2 bg-main-blue text-white rounded-lg hover:opacity-90"
             >
               {isEdit ? "Guardar Cambios" : "Crear Reservación"}
             </button>
-
           </div>
-
         </form>
-
       </div>
     </div>
   );
