@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { UsuariosModal } from './UsuariosModal';
-import { UsuariosModalDelete } from './UsuariosModalDelete';
 
 export const Usuarios = () => {
     const [usuarios, setUsuarios] = useState([

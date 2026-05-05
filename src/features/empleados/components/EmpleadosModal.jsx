@@ -1,109 +1,169 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 
-export const EmpleadosModal = ({ isOpen, onClose, empleado }) => {
-    const isEdit = !!empleado;
+import { useEmpleadosStore } from "../../users/store/adminStore"; // Debes tener el store de empleados
 
-    const [formData, setFormData] = useState({
-        id: '',
-        name: '',
-        surname: '',
-        role: 'Mesero',
-        branch: 'La Reformita',
-        status: true
-    });
+import { useSaveEmployee } from "../hooks/useSaveEmpleados.js"; // Hook similar a useSaveField
+import { Spinner } from "../../auth/components/Spinner.jsx";
+import { showSuccess, showError } from "../../../shared/utils/toast";
 
-    useEffect(() => {
-        if (empleado && isOpen) {
-            setFormData({ ...empleado });
-        } else if (!empleado && isOpen) {
-            setFormData({
-                id: '',
-                name: '',
-                surname: '',
-                role: 'Mesero',
-                branch: 'La Reformita',
-                status: true
-            });
-        }
-    }, [empleado, isOpen]);
+export const EmpleadoModal = ({ isOpen, onClose, empleado }) => {
 
-    if (!isOpen) return null;
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm();
 
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
-    };
+  const { saveEmpleado } = useSaveEmpleados();
+  const loading = useEmpleadosStore((state) => state.loading);
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log("Guardando empleado...", formData);
-        onClose();
-    };
+  // Rellenar formulario si editando o limpiar si nuevo
+  useEffect(() => {
+    if (isOpen) {
+      if (empleado) {
+        reset({
+          name: empleado.name,
+          surname: empleado.surname,
+          dpi: empleado.dpi,
+          puesto: empleado.puesto,
+          sueldo: empleado.sueldo,
+          status: empleado.status
+        });
+      } else {
+        reset({
+          name: "",
+          surname: "",
+          dpi: "",
+          puesto: "MESERO",
+          sueldo: 0,
+          status: true
+        });
+      }
+    }
+  }, [isOpen, empleado, reset]);
 
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-            <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                    <h2 className="text-xl font-bold text-gray-800">
-                        {isEdit ? 'Editar Empleado' : 'Nuevo Empleado'}
-                    </h2>
-                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1 rounded-md hover:bg-gray-200 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
+  const onSubmit = async (data) => {
+    try {
+      await saveEmpleado(data, empleado?._id);
+      showSuccess(
+        empleado
+          ? "Empleado actualizado correctamente"
+          : "Empleado creado correctamente"
+      );
+      reset();
+      onClose();
+    } catch (err) {
+      showError("Error al guardar el empleado");
+    }
+  };
 
-                <form onSubmit={handleSubmit} className="p-6">
-                    <div className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-                                <input type="text" name="name" value={formData.name} onChange={handleChange} required className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-200 focus:border-orange-400 outline-none" />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Apellido</label>
-                                <input type="text" name="surname" value={formData.surname} onChange={handleChange} required className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-200 focus:border-orange-400 outline-none" />
-                            </div>
-                        </div>
+  if (!isOpen) return null;
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Puesto</label>
-                                <select name="role" value={formData.role} onChange={handleChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none">
-                                    <option value="Mesero">Mesero</option>
-                                    <option value="Chef">Chef</option>
-                                    <option value="Bartender">Bartender</option>
-                                    <option value="Gerente">Gerente</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Sucursal</label>
-                                <select name="branch" value={formData.branch} onChange={handleChange} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none">
-                                    <option value="La Reformita">La Reformita</option>
-                                    <option value="Zona 10">Zona 10</option>
-                                    <option value="San Cristóbal">San Cristóbal</option>
-                                </select>
-                            </div>
-                        </div>
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 px-3 sm:px-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg md:max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col overflow-hidden">
 
-                        <div className="flex items-center gap-2 pt-2">
-                            <input type="checkbox" id="status" name="status" checked={formData.status} onChange={handleChange} className="w-4 h-4 text-orange-500 rounded focus:ring-orange-400 border-gray-300" />
-                            <label htmlFor="status" className="text-sm font-medium text-gray-700">En Turno / Activo</label>
-                        </div>
-                    </div>
+          {/* HEADER */}
+          <div className="p-4 sm:p-5 text-white sticky top-0 z-10"
+               style={{ background: "linear-gradient(90deg, var(--main-blue) 0%, #1956a3 100%)" }}>
+            <h2 className="text-xl sm:text-2xl font-bold">
+              {empleado ? "Editar Empleado" : "Nuevo Empleado"}
+            </h2>
+            <p className="text-xs sm:text-sm opacity-80">
+              Completa la información del empleado
+            </p>
+          </div>
 
-                    <div className="mt-8 flex justify-end gap-3">
-                        <button type="button" onClick={onClose} className="px-5 py-2.5 text-gray-600 bg-gray-100 hover:bg-gray-200 font-medium rounded-lg">Cancelar</button>
-                        <button type="submit" className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg shadow-sm">
-                            {isEdit ? 'Actualizar Colaborador' : 'Registrar Empleado'}
-                        </button>
-                    </div>
-                </form>
+          {/* FORM */}
+          <div className="p-4 sm:p-6 space-y-5 overflow-y-auto">
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Nombre */}
+              <div className="flex flex-col">
+                <label className="text-sm font-semibold text-gray-700 mb-1">Nombre</label>
+                <input
+                  className="w-full px-3 py-2 rounded-lg border-2 border-gray-300 bg-gray-50 shadow-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
+                  {...register("name", { required: "El nombre es obligatorio", minLength: { value: 3, message: "Mínimo 3 caracteres" } })}
+                />
+                {errors.name && <p className="text-red-600 text-sm mt-1">{errors.name.message}</p>}
+              </div>
+
+              {/* Apellido */}
+              <div className="flex flex-col">
+                <label className="text-sm font-semibold text-gray-700 mb-1">Apellido</label>
+                <input
+                  className="w-full px-3 py-2 rounded-lg border-2 border-gray-300 bg-gray-50 shadow-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
+                  {...register("surname", { required: "El apellido es obligatorio", minLength: { value: 3, message: "Mínimo 3 caracteres" } })}
+                />
+                {errors.surname && <p className="text-red-600 text-sm mt-1">{errors.surname.message}</p>}
+              </div>
+
+              {/* DPI */}
+              <div className="flex flex-col md:col-span-2">
+                <label className="text-sm font-semibold text-gray-700 mb-1">DPI</label>
+                <input
+                  className="w-full px-3 py-2 rounded-lg border-2 border-gray-300 bg-gray-50 shadow-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
+                  {...register("dpi", { required: "El DPI es obligatorio", minLength: { value: 13, message: "DPI inválido" } })}
+                />
+                {errors.dpi && <p className="text-red-600 text-sm mt-1">{errors.dpi.message}</p>}
+              </div>
+
+              {/* Puesto */}
+              <div className="flex flex-col">
+                <label className="text-sm font-semibold text-gray-700 mb-1">Puesto</label>
+                <select className="w-full px-3 py-2 rounded-lg border-2 border-gray-300 bg-gray-50 shadow-sm outline-none"
+                        {...register("puesto", { required: true })}>
+                  <option value="MESERO">Mesero</option>
+                  <option value="CHEF">Chef</option>
+                  <option value="COMENSAL">Comensal</option>
+                  <option value="SERVICIO DE LIMPIEZA">Servicio de limpieza</option>
+                </select>
+              </div>
+
+              {/* Sueldo */}
+              <div className="flex flex-col">
+                <label className="text-sm font-semibold text-gray-700 mb-1">Sueldo</label>
+                <input
+                  type="number"
+                  className="w-full px-3 py-2 rounded-lg border-2 border-gray-300 bg-gray-50 shadow-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
+                  {...register("sueldo", { required: "El sueldo es obligatorio", min: { value: 0, message: "Debe ser positivo" } })}
+                />
+                {errors.sueldo && <p className="text-red-600 text-sm mt-1">{errors.sueldo.message}</p>}
+              </div>
+
+              {/* Status */}
+              <div className="flex items-center gap-2 md:col-span-2 pt-2">
+                <input
+                  type="checkbox"
+                  id="status"
+                  {...register("status")}
+                  className="w-4 h-4 text-blue-500 rounded focus:ring-blue-400 border-gray-300"
+                />
+                <label htmlFor="status" className="text-sm font-medium text-gray-700">Activo</label>
+              </div>
             </div>
-        </div>
-    );
+
+            {/* BOTONES */}
+            <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-4 border-t">
+              <button type="button" className="w-full sm:w-auto px-4 py-2 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition"
+                      onClick={() => { reset(); onClose(); }}>
+                Cancelar
+              </button>
+
+              <button type="submit"
+                      disabled={loading}
+                      className="w-full sm:w-auto px-5 py-2 rounded-lg text-white font-medium transition shadow"
+                      style={{ background: "linear-gradient(90deg, var(--main-blue) 0%, #1956a3 100%)", border: "none" }}>
+                {loading ? <Spinner small /> : empleado ? "Guardar cambios" : "Crear empleado"}
+              </button>
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 };

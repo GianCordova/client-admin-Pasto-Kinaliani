@@ -1,18 +1,21 @@
-import React, { useState } from 'react';
-import { EmpleadosModal } from './EmpleadosModal';
-import { EmpleadosModalDelete } from './EmpleadosModalDelete';
+import { useState, useEffect } from 'react';
+import { useEffect as useToastEffect } from "react";
+
+import { useEmpleadosStore } from "../../users/store/adminStore";
+import { useUIStore } from "../../auth/store/uiStore";
+
+import { showError, showSuccess } from "../../../shared/utils/toast";
+import { Spinner } from "../../auth/components/Spinner.jsx";
+import { EmpleadoModal } from './EmpleadosModal';
+import { showConfirmToast } from "../../auth/components/ConfirmModal.jsx";
+
 
 export const Empleados = () => {
-    const [empleados, setEmpleados] = useState([
-        { id: "EMP-001", name: "Juan", surname: "Pérez", role: "Mesero", branch: "La Reformita", status: true },
-        { id: "EMP-002", name: "María", surname: "García", role: "Chef", branch: "Zona 10", status: true },
-        { id: "EMP-003", name: "Carlos", surname: "López", role: "Bartender", branch: "San Cristóbal", status: false },
-        { id: "EMP-004", name: "Ana", surname: "Martínez", role: "Gerente", branch: "Zona 10", status: true },
-    ]);
+    // Inicialmente no hay empleados
+    const [empleados, setEmpleados] = useState([]);
 
     const [searchTerm, setSearchTerm] = useState("");
-    
-    // Estados para Modales
+
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [selectedEmpleado, setSelectedEmpleado] = useState(null);
@@ -27,20 +30,36 @@ export const Empleados = () => {
         setIsDeleteModalOpen(true);
     };
 
-    const handleConfirmDelete = () => {
-        setEmpleados(empleados.filter(e => e.id !== selectedEmpleado.id));
-        setIsDeleteModalOpen(false);
+    const saveEmpleado = (empleado) => {
+        if (empleado.id) {
+            setEmpleados(prev =>
+                prev.map(e => e.id === empleado.id ? empleado : e)
+            );
+        } else {
+            const newEmpleado = {
+                ...empleado,
+                id: `EMP-${Math.floor(Math.random() * 1000).toString().padStart(3,'0')}`
+            };
+            setEmpleados(prev => [...prev, newEmpleado]);
+        }
     };
 
-    // --- LÓGICA DE FILTRADO ---
+    const handleConfirmDelete = () => {
+        if (selectedEmpleado) {
+            setEmpleados(prev => prev.filter(e => e.id !== selectedEmpleado.id));
+            setIsDeleteModalOpen(false);
+            setSelectedEmpleado(null);
+        }
+    };
+
     const filteredEmpleados = empleados.filter((e) => {
         const term = searchTerm.toLowerCase();
         return (
-            e.name.toLowerCase().includes(term) ||
-            e.surname.toLowerCase().includes(term) ||
-            e.role.toLowerCase().includes(term) ||
-            e.branch.toLowerCase().includes(term) ||
-            e.id.toLowerCase().includes(term)
+            e.name?.toLowerCase().includes(term) ||
+            e.surname?.toLowerCase().includes(term) ||
+            e.role?.toLowerCase().includes(term) ||
+            e.branch?.toLowerCase().includes(term) ||
+            e.id?.toLowerCase().includes(term)
         );
     });
 
@@ -60,7 +79,7 @@ export const Empleados = () => {
                 </button>
             </div>
 
-            {/* FILTROS */}
+            {/* FILTRO */}
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-6">
                 <div className="relative">
                     <input
@@ -91,7 +110,6 @@ export const Empleados = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 bg-white">
-                            {/* CAMBIO AQUÍ: Usamos filteredEmpleados en lugar de empleados */}
                             {filteredEmpleados.length > 0 ? (
                                 filteredEmpleados.map((e) => (
                                     <tr key={e.id} className="hover:bg-orange-50/30 transition-colors group">
@@ -119,14 +137,10 @@ export const Empleados = () => {
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex justify-end gap-2">
                                                 <button onClick={() => handleOpenModal(e)} className="p-2 hover:bg-orange-100 text-orange-400 rounded-lg transition-colors">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                    </svg>
+                                                    ✏️
                                                 </button>
                                                 <button onClick={() => handleOpenDeleteModal(e)} className="p-2 hover:bg-red-100 text-red-400 rounded-lg transition-colors">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                    </svg>
+                                                    🗑️
                                                 </button>
                                             </div>
                                         </td>
@@ -135,7 +149,7 @@ export const Empleados = () => {
                             ) : (
                                 <tr>
                                     <td colSpan="4" className="px-6 py-10 text-center text-gray-400 italic">
-                                        No se encontraron empleados que coincidan con la búsqueda.
+                                        No se encontraron empleados.
                                     </td>
                                 </tr>
                             )}
@@ -149,6 +163,7 @@ export const Empleados = () => {
                 isOpen={isModalOpen} 
                 onClose={() => setIsModalOpen(false)} 
                 empleado={selectedEmpleado} 
+                onSave={saveEmpleado} 
             />
             <EmpleadosModalDelete 
                 isOpen={isDeleteModalOpen} 
