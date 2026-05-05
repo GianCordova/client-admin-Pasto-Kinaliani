@@ -1,45 +1,57 @@
 import { useEffect, useState } from "react";
-import { useReservacionesStore } from "../../users/store/adminStore"; // tu store de reservaciones
-import { showConfirmToast } from "../../auth/components/ConfirmModal";
-import { showApproveToast } from "../../auth/components/AprobedModal";
-import { PedidosFilter } from "../../pedidos/components/PedidosFilter";
-import { ReservacionesForm } from "./ReservacionesModal"; // formulario de agregar / editar
+import { useReservationsStore } from "../../users/store/adminStore.js";
+import { ReservacionesForm } from "./ReservacionesModal.jsx";
+import { ReservacionesFilter } from "./ReservacionesFilter.jsx";
+import { showConfirmToast } from "../../auth/components/ConfirmModal.jsx";
+import { showApproveToast } from "../../auth/components/AprobedModal.jsx";
 
 export const Reservaciones = () => {
-  const { reservaciones, getReservaciones, cancelarReservacion, confirmarReservacion } = useReservacionesStore();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedReservacion, setSelectedReservacion] = useState(null);
+
+  const {
+    reservaciones,
+    getReservations,
+    cancelReservation,
+    confirmReservation,
+  } = useReservationsStore();
+
+  const [filtered, setFiltered] = useState([]);
 
   useEffect(() => {
-    getReservaciones();
+    getReservations();
   }, []);
+
+  useEffect(() => {
+    setFiltered(reservaciones);
+  }, [reservaciones]);
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [selected, setSelected] = useState(null);
+
+  const openCreate = () => {
+    setSelected(null);
+    setIsOpen(true);
+  };
+
+  const openEdit = (res) => {
+    setSelected(res);
+    setIsOpen(true);
+  };
 
   const handleDelete = (res) => {
     showConfirmToast({
-      title: "Cancelar reservación",
-      message: `¿Cancelar reservación ${res.id_usuario}?`,
-      onConfirm: () => cancelarReservacion(res.id),
+      title: "Eliminar reservación",
+      message: `¿Eliminar reservación de ${res.id_usuario?.name}?`,
+      onConfirm: () => cancelReservation(res._id),
     });
   };
 
-  const handleApprove = (res) => {
+  const handleAprove = (res) => {
     showApproveToast({
-      title: "Confirmar reservación",
-      message: `¿Confirmar reservación ${res.id_usuario}?`,
-      onConfirm: () => confirmarReservacion(res.id),
+      title: "Aprobar reservación",
+      message: `¿Aprobar reservación ${res._id}?`,
+      onConfirm: () => confirmReservation(res._id),
     });
   };
-
-  // Filtrado por texto libre: usuario o estado
-  const filtered = searchTerm
-    ? reservaciones.filter((r) =>
-      (r.id_usuario || "")
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      (r.estado || "").toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    : reservaciones;
 
   const statusColors = {
     pendiente: "bg-yellow-100 text-yellow-700",
@@ -52,30 +64,34 @@ export const Reservaciones = () => {
 
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
+
         <div>
-          <h2 className="text-3xl font-bold text-gray-800 tracking-tight">Reservaciones</h2>
-          <p className="text-gray-500 text-sm mt-1">Gestión de reservaciones del sistema.</p>
+          <h2 className="text-3xl font-bold text-gray-800">
+            Reservaciones
+          </h2>
+          <p className="text-gray-500 text-sm mt-1">
+            Gestión de reservaciones del sistema.
+          </p>
         </div>
 
-        {/* BOTON AGREGAR */}
         <button
-          onClick={() => {
-            setSelectedReservacion(null); // limpiar selección para nuevo
-            setIsModalOpen(true);
-          }}
-          className="px-4 py-2 rounded-lg bg-main-blue text-white hover:bg-blue-700"
+          onClick={openCreate}
+          className="px-5 py-2 bg-main-blue text-white rounded-lg hover:opacity-90"
         >
-          Agregar
+          + Agregar
         </button>
+
       </div>
 
-      {/* SEARCH */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-6">
-        <ReservacionesFilter onSearch={(value) => setSearchTerm(value)} />
-      </div>
+      {/* 🔥 FILTER */}
+      <ReservacionesFilter
+        reservaciones={reservaciones}
+        onFilter={setFiltered}
+      />
 
-      {/* GRID DE RESERVACIONES */}
+      {/* GRID */}
       <div className="grid sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+
         {filtered.length === 0 ? (
           <div className="col-span-full text-center text-gray-400 py-12">
             No se encontraron reservaciones.
@@ -83,65 +99,79 @@ export const Reservaciones = () => {
         ) : (
           filtered.map((r) => (
             <div
-              key={r.id}
-              className="bg-white rounded-xl shadow-md border border-gray-100 p-5 hover:shadow-xl transition-all duration-300"
+              key={r._id}
+              className="bg-white rounded-xl shadow-md border p-5 hover:shadow-lg transition"
             >
-              {/* HEADER CARD */}
-              <h3 className="text-lg font-bold text-main-blue">{r.id_usuario}</h3>
-              <div className="text-[10px] text-gray-400 font-mono mt-1 uppercase tracking-tighter">
-                ID: {r.id}
+              <h3 className="text-lg font-bold text-main-blue">
+                {r.id_usuario?.name}
+              </h3>
+
+              <div className="text-xs text-gray-400 font-mono">
+                {r._id}
               </div>
 
-              {/* DETALLES */}
-              <div className="mt-3 space-y-1 text-sm text-gray-700">
-                <p><span className="font-semibold">Fecha:</span> {r.fecha}</p>
-                <p><span className="font-semibold">Hora:</span> {r.hora}</p>
-                <p><span className="font-semibold">Personas:</span> {r.numero_personas}</p>
-                <p><span className="font-semibold">Mesas:</span> {r.numero_mesas}</p>
+              <div className="mt-3 text-sm space-y-1">
+
+                <p><b>Email:</b> {r.id_usuario?.email}</p>
+                <p><b>Fecha:</b> {r.fecha}</p>
+                <p><b>Hora:</b> {r.hora}</p>
+                <p><b>Personas:</b> {r.numero_personas}</p>
+                <p><b>Mesas:</b> {r.numero_mesas}</p>
 
                 <p>
-                  <span className="font-semibold">Estado:</span>{" "}
-                  <span className={`px-3 py-1 text-xs rounded-full font-bold uppercase tracking-wider ${statusColors[r.estado] || "bg-gray-100 text-gray-700"}`}>
+                  <b>Estado:</b>{" "}
+                  <span className={`px-3 py-1 text-xs rounded-full font-bold uppercase ${statusColors[r.estado]}`}>
                     {r.estado}
                   </span>
                 </p>
+
               </div>
 
-              {/* BOTONES solo si está pendiente */}
               {r.estado === "pendiente" && (
                 <div className="flex gap-3 mt-5">
+
                   <button
-                    onClick={() => handleApprove(r)}
-                    className="group relative flex-1 py-2 rounded-lg bg-green-600 text-white flex items-center justify-center overflow-hidden transition-all duration-300 hover:bg-green-700"
+                    onClick={() => openEdit(r)}
+                    className="flex-1 py-2 bg-orange-600 text-white rounded-lg"
                   >
-                    Confirmar
+                    Editar
                   </button>
+
                   <button
                     onClick={() => handleDelete(r)}
-                    className="group relative flex-1 py-2 rounded-lg bg-red-600 text-white flex items-center justify-center overflow-hidden transition-all duration-300 hover:bg-red-700"
+                    className="flex-1 py-2 bg-red-500 text-white rounded-lg"
                   >
                     Cancelar
                   </button>
+
+                  <button
+                    onClick={() => handleAprove(r)}
+                    className="flex-1 py-2 bg-green-600 text-white rounded-lg"
+                  >
+                    Confirmar
+                  </button>
+
                 </div>
               )}
             </div>
           ))
         )}
+
       </div>
 
       {/* TOTAL */}
-      <div className="mt-6 bg-white px-6 py-4 rounded-xl border border-gray-200 flex items-center justify-between">
-        <div className="text-xs text-gray-500 font-medium">
-          Total: <span className="text-gray-800">{filtered.length} reservaciones</span>
-        </div>
+      <div className="mt-6 bg-white px-6 py-4 rounded-xl border flex justify-between">
+        <span>Total:</span>
+        <span className="font-bold">{filtered.length}</span>
       </div>
 
-      {/* MODAL AGREGAR / EDITAR */}
+      {/* 📌 FORM MODAL */}
       <ReservacionesForm
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        reservacion={selectedReservacion}
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        reservacion={selected}
       />
+
     </div>
   );
 };

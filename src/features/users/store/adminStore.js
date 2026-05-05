@@ -1,4 +1,5 @@
 import { create } from "zustand";
+
 import {
     getPedidos as getPedidosRequest,
     createPedido as createPedidoRequest,
@@ -15,6 +16,9 @@ import {
     cancelReservation as cancelReservationRequest,
 } from "../../../shared/api";
 
+/* =========================
+        PEDIDOS STORE
+========================= */
 export const usePedidosStore = create((set, get) => ({
     pedidos: [],
     loading: false,
@@ -100,16 +104,17 @@ export const usePedidosStore = create((set, get) => ({
         try {
             set({ loading: true, error: null });
 
-            // Opcional: validar estado
             const estadosValidos = ["PENDIENTE", "COMPLETADO", "CANCELADO"];
+
             if (!estadosValidos.includes(status)) {
-                set({ loading: false, error: `Estado inválido. Debe ser uno de: ${estadosValidos.join(", ")}` });
+                set({
+                    loading: false,
+                    error: `Estado inválido. Debe ser: ${estadosValidos.join(", ")}`,
+                });
                 return;
             }
 
-            // Llamada a tu API filtrando por status
             const res = await getPedidosRequest(`/status/${status}`);
-            // Asegúrate que tu API tenga esta ruta GET /pedidos/status/:status
 
             set({
                 pedidos: res.data.pedidos,
@@ -118,18 +123,23 @@ export const usePedidosStore = create((set, get) => ({
         } catch (err) {
             set({
                 loading: false,
-                error: err.response?.data?.message || "Error al obtener pedidos por estado",
+                error:
+                    err.response?.data?.message ||
+                    "Error al obtener pedidos por estado",
             });
         }
     },
 }));
 
+/* =========================
+     RESERVACIONES STORE
+========================= */
 export const useReservationsStore = create((set, get) => ({
     reservaciones: [],
     loading: false,
     error: null,
 
-    // ================= OBTENER TODAS =================
+    // ================= GET ALL =================
     getReservations: async () => {
         try {
             set({ loading: true, error: null });
@@ -137,18 +147,20 @@ export const useReservationsStore = create((set, get) => ({
             const res = await getReservationsRequest();
 
             set({
-                reservaciones: res.data.data, // tu API devuelve data
+                reservaciones: res.data.data,
                 loading: false,
             });
         } catch (err) {
             set({
                 loading: false,
-                error: err.response?.data?.message || "Error al obtener reservaciones",
+                error:
+                    err.response?.data?.message ||
+                    "Error al obtener reservaciones",
             });
         }
     },
 
-    // ================= CREAR =================
+    // ================= CREATE =================
     createReservation: async (data) => {
         try {
             set({ loading: true, error: null });
@@ -162,28 +174,34 @@ export const useReservationsStore = create((set, get) => ({
         } catch (err) {
             set({
                 loading: false,
-                error: err.response?.data?.message || "Error al crear reservación",
+                error:
+                    err.response?.data?.message ||
+                    "Error al crear reservación",
             });
         }
     },
 
-    // ================= OBTENER POR ID =================
+    // ================= GET BY ID =================
     getReservationById: async (id) => {
         try {
             set({ loading: true, error: null });
 
             const res = await getReservationByIdRequest(id);
 
-            return res.data.data; // retorna la reservación específica
+            set({ loading: false });
+
+            return res.data.data;
         } catch (err) {
             set({
                 loading: false,
-                error: err.response?.data?.message || "Error al obtener reservación",
+                error:
+                    err.response?.data?.message ||
+                    "Error al obtener reservación",
             });
         }
     },
 
-    // ================= ACTUALIZAR =================
+    // ================= UPDATE =================
     updateReservation: async (id, data) => {
         try {
             set({ loading: true, error: null });
@@ -199,12 +217,14 @@ export const useReservationsStore = create((set, get) => ({
         } catch (err) {
             set({
                 loading: false,
-                error: err.response?.data?.message || "Error al actualizar reservación",
+                error:
+                    err.response?.data?.message ||
+                    "Error al actualizar reservación",
             });
         }
     },
 
-    // ================= CONFIRMAR =================
+    // ================= CONFIRM =================
     confirmReservation: async (id) => {
         try {
             set({ loading: true });
@@ -220,12 +240,14 @@ export const useReservationsStore = create((set, get) => ({
         } catch (err) {
             set({
                 loading: false,
-                error: err.response?.data?.message || "Error al confirmar reservación",
+                error:
+                    err.response?.data?.message ||
+                    "Error al confirmar reservación",
             });
         }
     },
 
-    // ================= CANCELAR =================
+    // ================= CANCEL =================
     cancelReservation: async (id) => {
         try {
             set({ loading: true });
@@ -241,23 +263,30 @@ export const useReservationsStore = create((set, get) => ({
         } catch (err) {
             set({
                 loading: false,
-                error: err.response?.data?.message || "Error al cancelar reservación",
+                error:
+                    err.response?.data?.message ||
+                    "Error al cancelar reservación",
             });
         }
     },
 
-    // ================= FILTRAR POR ESTADO =================
+    // ================= FILTER BY STATUS =================
     getReservationsByStatus: async (status) => {
         try {
             set({ loading: true, error: null });
 
-            const validStates = ["confirmada", "cancelada", "pendiente"];
-            if (!validStates.includes(status.toLowerCase())) {
-                set({ loading: false, error: `Estado inválido. Debe ser uno de: ${validStates.join(", ")}` });
+            const validStates = ["pendiente", "confirmada", "cancelada"];
+
+            if (!validStates.includes(status)) {
+                set({
+                    loading: false,
+                    error: `Estado inválido: ${validStates.join(", ")}`,
+                });
                 return;
             }
 
             const res = await getReservationsRequest(`/status/${status}`);
+
             set({
                 reservaciones: res.data.data,
                 loading: false,
@@ -265,7 +294,9 @@ export const useReservationsStore = create((set, get) => ({
         } catch (err) {
             set({
                 loading: false,
-                error: err.response?.data?.message || "Error al obtener reservaciones por estado",
+                error:
+                    err.response?.data?.message ||
+                    "Error al filtrar reservaciones",
             });
         }
     },
