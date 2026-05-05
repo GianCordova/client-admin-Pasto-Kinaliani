@@ -21,6 +21,24 @@ axiosAuth.interceptors.request.use((config) => {
     return config;
 });
 
+// Instancia de axios 
+const axiosAdmin = axios.create({
+    baseURL: import.meta.env.VITE_ADMIN_URL,
+    timeout: 800000,
+    headers: {
+        "Content-Type": "application/json",
+    }
+});
+
+// Configuracion de interceptores
+axiosAdmin.interceptors.request.use((config) => {
+    config._axiosClient = "admin";
+    const token = useAuthStore.getState().token;
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
 // Configuracion de documentacion axios
 let _isRefreshing = false;
 let failedQueue = [];
@@ -105,9 +123,8 @@ const handleRefreshToken = async function (_error) {
 
 axiosAuth.interceptors.response.use((res) => res, handleRefreshToken);
 
-// axiosAdmin.interceptors.response.use((res) => res, handleRefreshToken);
+axiosAdmin.interceptors.response.use((res) => res, handleRefreshToken);
 
 // ================= EXPORT AXIOS =================
-// export { axiosAuth, axiosAdmin };
-export { axiosAuth };
+export { axiosAuth, axiosAdmin };
 export { handleRefreshToken };
