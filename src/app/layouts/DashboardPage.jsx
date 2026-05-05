@@ -3,6 +3,6 @@ import { DashboardContainer } from "../../shared/components/layout/DashboardCont
 export const DashboardPage = () => {
 
     return (
-        <DashboardContainer/>
+        <DashboardContainer />
     );
 }

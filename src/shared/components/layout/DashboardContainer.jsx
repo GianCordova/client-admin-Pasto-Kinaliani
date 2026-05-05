@@ -1,8 +1,17 @@
 import { useState } from "react";
 import { Navbar } from "./Navbar";
 import { Sidebar } from "./Sidebar";
-import { Mesas } from "../../../features/mesas/components/mesas";
-import { Sucursales } from "../../../features/sucursales/components/sucursales";
+import { Reservaciones } from "../../../features/reservaciones/components/Reservaciones.jsx";
+import { Pedidos } from "../../../features/pedidos/components/Pedidos.jsx";
+import { Empleados } from "../../../features/empleados/components/Empleados.jsx";
+import { Inventario } from "../../../features/inventario/components/inventario.jsx";
+import { Mesas } from "../../../features/mesas/components/mesas.jsx";
+import { Platillos } from "../../../features/platillos/components/platillos.jsx";
+import { Proveedores } from "../../../features/proveedores/components/proveedores.jsx";
+import { Sucursales } from "../../../features/sucursales/components/sucursales.jsx";
+import { Usuarios } from "../../../features/usuarios/components/Usuarios.jsx";
+import { Ventas } from "../../../features/ventas/components/ventas.jsx";
+
 
 export const DashboardContainer = () => {
 
@@ -10,24 +19,48 @@ export const DashboardContainer = () => {
 
   const renderView = () => {
     switch (view) {
+
+      case "Empleados":
+        return <Empleados />;
+
+      case "Inventario":
+        return <Inventario />;
+
+      case "Mesas":
+        return <Mesas />;
+
+      case "Pedidos":
+        return <Pedidos />;
+
+      case "Platillos":
+        return <Platillos />;
+
+      case "Proveedores":
+        return <Proveedores />;
+
+      case "Reservaciones":
+        return <Reservaciones />;
+
+      case "Sucursales":
+        return <Sucursales />;
+
+      case "Usuarios":
+        return <Usuarios />;
+
+      case "Ventas":
+        return <Ventas />;
+
       case "welcome":
         return (
           <div className="flex flex-col items-center justify-center h-full text-center">
-            <img src="./src/assets/img/pastor_kinaliani_2.png" alt="Logo" className="w-64 h-64 mb-4 rounded-lg shadow-lg" />
             <h1 className="text-4xl font-bold text-gray-700 mb-4">
-              Bienvenido a Pasto Kinaliani
+              Bienvenido 👋
             </h1>
             <p className="text-gray-500">
               Selecciona una opción del menú para comenzar
             </p>
           </div>
         );
-
-      case "Mesas":
-        return <Mesas />;
-
-      case "Sucursales":
-        return <Sucursales />;
 
       default:
         return <h2>Vista no encontrada</h2>;
