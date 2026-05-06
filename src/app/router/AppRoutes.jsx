@@ -3,7 +3,7 @@ import { AuthPage } from "../../features/auth/pages/AuthPage.jsx";
 import { DashboardContainer } from "../../shared/components/layout/DashboardContainer.jsx";
 import { Empleados } from "../../features/empleados/components/Empleados.jsx";
 import { Inventario } from "../../features/inventario/components/Inventario.jsx";
-import { Mesas } from "../../features/mesas/components/Mesas.jsx";
+import { Mesas } from "../../features/mesas/components/mesas.jsx";
 import { Pedidos } from "../../features/pedidos/components/Pedidos.jsx";
 import { Platillos } from "../../features/platillos/components/Platillos.jsx";
 import { Proveedores } from "../../features/proveedores/components/Proveedores.jsx";

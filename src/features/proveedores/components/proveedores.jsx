@@ -9,11 +9,11 @@ export const Proveedores = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProveedor, setSelectedProveedor] = useState(null);
 
-  const API_URL = "http://localhost:3002/gestionRestaurantes/v1/proveedores";
+const API_URL = "http://localhost:3002/gestionRestaurantes/v1/admin/proveedores";
 
   const fetchProveedores = async () => {
     try {
-      const response = await fetch(API_URL);
+const response = await fetch(`${API_URL}?limit=100`);
       const data = await response.json();
       
       if (Array.isArray(data)) {
@@ -55,12 +55,11 @@ export const Proveedores = () => {
           return toast.error(errorData.message || "Error al desactivar");
         }
 
-        // --- CAMBIO AQUÍ: No filtramos, actualizamos el estado ---
         setProveedores(prev =>
           prev.map(p => 
             (p._id || p.id) === idToDelete 
-              ? { ...p, isActive: false } // Cambiamos solo este proveedor
-              : p // Los demás se quedan igual
+              ? { ...p, isActive: false } 
+              : p 
           )
         );
 
