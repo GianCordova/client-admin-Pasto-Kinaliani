@@ -1,26 +1,30 @@
 import { axiosAdmin } from "./api";
 
-// ================= EMPLOYEES =================
-export const getEmployees = async () => {
-    return await axiosAdmin.get("/empleados"); // GET all activos
+// ================= EMPLEADOS =================
+export const getEmpleados = async () => {
+    return await axiosAdmin.get("/empleados");
 };
 
-export const getEmployeeById = async (id) => {
+export const getEmpleadoById = async (id) => {
     return await axiosAdmin.get(`/empleados/${id}`);
 };
 
-export const createEmployee = async (data) => {
+export const saveEmpleado = async (data) => {
+    // Usamos POST para crear
     return await axiosAdmin.post("/empleados", data);
 };
 
-export const updateEmployee = async (id, data) => {
+export const updateEmpleado = async (id, data) => {
+    // Usamos PUT para actualizar
     return await axiosAdmin.put(`/empleados/${id}`, data);
 };
 
-export const activateEmployee = async (id) => {
-    return await axiosAdmin.put(`/empleados/${id}/activate`);
+export const activateEmpleado = async (id) => {
+    // Coincide con la función activateEmpleado del controlador
+    return await axiosAdmin.put(`/empleados/activate/${id}`);
 };
 
-export const deactivateEmployee = async (id) => {
-    return await axiosAdmin.put(`/empleados/${id}/deactivate`);
+export const deactivateEmpleado = async (id) => {
+    // Coincide con la función deactivateEmpleado del controlador
+    return await axiosAdmin.put(`/empleados/deactivate/${id}`);
 };
