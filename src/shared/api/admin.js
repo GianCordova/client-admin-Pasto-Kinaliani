@@ -25,3 +25,29 @@ export const toggleSucursalStatus = async (id, isActive) => {
     const endpoint = isActive ? 'desactivar' : 'activar';
     return await axiosAdmin.put(`/sucursales/${id}/${endpoint}`);
 }
+
+// =================Platillos================
+export const getPlatillos = async () => {
+    return await axiosAdmin.get('/platillos');
+}
+
+export const createPlatillo = async (platilloData) => {
+    return await axiosAdmin.post('/platillos', platilloData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        }
+    });
+}
+
+export const updatePlatillo = async (id, platilloData) => {
+    return await axiosAdmin.put(`/platillos/${id}`, platilloData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        }
+    });
+}
+
+export const togglePlatilloStatus = async (id, isActive) => {
+    const endpoint = isActive ? 'desactivar' : 'activar';
+    return await axiosAdmin.put(`/platillos/${id}/${endpoint}`);
+}

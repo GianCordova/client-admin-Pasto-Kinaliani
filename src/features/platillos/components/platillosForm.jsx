@@ -1,65 +1,86 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { Spinner } from "../../auth/components/Spinner";
+import { usePlatillosStore } from "../../usuarios/store/adminStore";
+import { useSavePlatillo } from "../hooks/useSavePlatillo"
+import { showSuccess, showError } from "../../../shared/utils/toast";
 
 export const PlatillosForm = ({ isOpen, onClose, platillo }) => {
-    const isEdit = !!platillo;
 
-    const [form, setForm] = useState({
-        nombre: "",
-        descripcion: "",
-        precio: "",
-        categoria: "",
-        isActive: true
-    });
+    //Formulario
+    const {
+        register,
+        handleSubmit,
+        reset,
+        watch,
+        formState: { errors },
+    } = useForm();
 
-    // Efecto para cargar datos cuando se abre el modal (Editar o Nuevo)
+    const { savePlatillo } = useSavePlatillo();
+    const loading = usePlatillosStore((state) => state.loading);
+
+    const [preview, setPreview] = useState(null);
+
     useEffect(() => {
-        if (platillo && isOpen) {
-            setForm({
-                nombre: platillo.nombre || '',
-                descripcion: platillo.descripcion || '',
-                precio: platillo.precio || '',
-                categoria: platillo.categoria || '',
-                isActive: platillo.isActive ?? true
-            });
-        } else if (!platillo && isOpen) {
-            setForm({
-                nombre: '',
-                descripcion: '',
-                precio: '',
-                categoria: '',
-                isActive: true
-            });
+        if (isOpen) {
+            if (platillo) {
+                reset({
+                    nombre: platillo.nombre,
+                    descripcion: platillo.descripcion,
+                    precio: platillo.precio,
+                    categoria: platillo.categoria,
+                    isActive: platillo.isActive,
+                });
+                setPreview(`https://res.cloudinary.com/dzvyh0ywj/image/upload/${platillo.photo}`);
+            } else {
+                reset({
+                    nombre: "",
+                    descripcion: "",
+                    precio: "",
+                    categoria: "",
+                    isActive: true,
+                });
+                setPreview(null);
+            }
         }
-    }, [platillo, isOpen]);
+    }, [isOpen, platillo, reset]);
 
-    // Si el modal no está abierto, no renderiza nada
+    useEffect(() => {
+        const subscription = watch((value, { name }) => {
+            if (name == "photo" && value.photo && value.photo.length > 0) {
+                setPreview(URL.createObjectURL(value.photo[0]));
+            }
+        });
+        return () => subscription.unsubscribe();
+    }, [watch]);
+
+    const onSubmit = async (data) => {
+        try {
+            await savePlatillo(data, platillo?._id);
+            showSuccess(
+                platillo
+                    ? "Platillo actualizado correctamente"
+                    : "Platillo creado correctamente"
+            );
+            reset();
+            setPreview(null);
+            onClose();
+        } catch (error) {
+            showError("Error al guardar el platillo");
+        }
+    }
+
     if (!isOpen) return null;
-
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setForm(prev => ({
-            ...prev,
-            [name]: type === "checkbox" ? checked : value
-        }));
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        // Aquí validas y envías a tu API de Express/Mongoose
-        console.log("Datos guardados:", form);
-        onClose(); // Cierra el modal después de guardar
-    };
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
             <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden animate-In">
-                
-                {/* Header Modal (Siguiendo el estilo de Proveedores) */}
+
                 <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                     <h2 className="text-xl font-bold text-gray-800">
-                        {isEdit ? 'Editar Platillo' : 'Nuevo Platillo'}
+                        {platillo ? 'Editar Platillo' : 'Nuevo Platillo'}
                     </h2>
-                    <button 
+                    <button
                         onClick={onClose}
                         className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-md hover:bg-gray-200"
                     >
@@ -70,33 +91,52 @@ export const PlatillosForm = ({ isOpen, onClose, platillo }) => {
                 </div>
 
                 {/* Form Body */}
-                <form onSubmit={handleSubmit} className="p-6">
+                <form onSubmit={handleSubmit(onSubmit)} className="p-6">
                     <div className="space-y-4">
-                        
+
+                        {/* PREVIEW & FILE INPUT */}
+                        <div className="flex flex-col items-center justify-center gap-4 mb-4">
+                            <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-2xl bg-gray-100 border flex items-center justify-center overflow-hidden shadow-inner">
+                                <span className="text-gray-400 text-xs sm:text-sm">
+                                    {preview ? (
+                                        <img src={preview} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <span className="text-gray-400 text-xs sm:text-sm">
+                                            Sin foto
+                                        </span>
+                                    )}
+                                </span>
+                            </div>
+                            <div className="w-full max-w-xs">
+                                <label className="block text-sm font-medium text-gray-700 mb-1 text-center">Fotografía (Opcional)</label>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    {...register("photo")}
+                                    className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100 cursor-pointer"
+                                />
+                            </div>
+                        </div>
+
                         {/* Fila: Nombre del Platillo */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Nombre del Platillo</label>
                             <input
-                                name="nombre"
+                                {...register('nombre', { required: 'El nombre es requerido' })}
                                 type="text"
-                                required
-                                value={form.nombre}
                                 placeholder="Ej. Pizza Margarita"
-                                onChange={handleChange}
                                 className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-200 focus:border-orange-400 outline-none transition-colors"
                             />
+                            {errors.nombre && <p className="text-red-500 text-sm mt-1">{errors.nombre.message}</p>}
                         </div>
 
                         {/* Campo: Descripción */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
                             <textarea
-                                name="descripcion"
+                                {...register('descripcion', { required: 'La descripción es requerida' })}
                                 rows="3"
-                                required
-                                value={form.descripcion}
                                 placeholder="Detalles de los ingredientes..."
-                                onChange={handleChange}
                                 className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-200 focus:border-orange-400 outline-none transition-colors resize-none"
                             />
                         </div>
@@ -106,42 +146,19 @@ export const PlatillosForm = ({ isOpen, onClose, platillo }) => {
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Precio (Q)</label>
                                 <input
-                                    name="precio"
+                                    {...register('precio', { required: 'El precio es requerido' })}
                                     type="number"
-                                    required
-                                    value={form.precio}
                                     placeholder="0.00"
-                                    onChange={handleChange}
                                     className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-200 focus:border-orange-400 outline-none transition-colors"
                                 />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
                                 <input
-                                    name="categoria"
-                                    type="text"
-                                    required
-                                    value={form.categoria}
-                                    placeholder="Ej. Italiana"
-                                    onChange={handleChange}
+                                    {...register('categoria', { required: 'La categoría es requerida' })}
                                     className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-200 focus:border-orange-400 outline-none transition-colors"
                                 />
                             </div>
-                        </div>
-
-                        {/* Estado Activo (Toggle Switch) */}
-                        <div className="flex items-center p-2 bg-gray-50 rounded-lg">
-                            <label className="relative inline-flex items-center cursor-pointer gap-3">
-                                <input
-                                    type="checkbox"
-                                    name="isActive"
-                                    className="sr-only peer"
-                                    checked={form.isActive}
-                                    onChange={handleChange}
-                                />
-                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-400"></div>
-                                <span className="text-sm font-medium text-gray-700">Platillo Activo</span>
-                            </label>
                         </div>
                     </div>
 
@@ -158,7 +175,7 @@ export const PlatillosForm = ({ isOpen, onClose, platillo }) => {
                             type="submit"
                             className="px-5 py-2.5 bg-orange-400 hover:bg-orange-500 text-white font-medium rounded-lg transition-colors shadow-sm"
                         >
-                            {isEdit ? 'Guardar Cambios' : 'Crear Platillo'}
+                            {platillo ? 'Guardar Cambios' : 'Crear Platillo'}
                         </button>
                     </div>
                 </form>

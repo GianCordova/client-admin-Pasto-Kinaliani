@@ -30,7 +30,7 @@ export const SucursalesModal = ({ isOpen, onClose, sucursal }) => {
                     telefono: sucursal.telefono,
                     horario: sucursal.horario,
                 })
-                setPreview(sucursal.photo)
+                setPreview(`https://res.cloudinary.com/dzvyh0ywj/image/upload/PASTO_KINALIANI/${sucursal.photo}`)
             } else {
                 reset({
                     nombre: '',
