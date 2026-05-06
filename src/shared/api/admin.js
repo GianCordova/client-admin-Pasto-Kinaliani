@@ -120,3 +120,41 @@ export const cancelReservation = async (id) => {
 export const getReservationsByStatus = async (status) => {
     return await axiosAdmin.get(`/reservaciones/status/${status}`);
 };
+
+// ================= EMPLEADOS =================
+export const getEmpleados = async () => {
+    return await axiosAdmin.get("/empleados");
+};
+
+export const getEmpleadoById = async (id) => {
+    return await axiosAdmin.get(`/empleados/${id}`);
+};
+
+export const saveEmpleado = async (data) => {
+    // Usamos POST para crear
+    return await axiosAdmin.post("/empleados", data);
+};
+
+export const updateEmpleado = async (id, data) => {
+    // Usamos PUT para actualizar
+    return await axiosAdmin.put(`/empleados/${id}`, data);
+};
+
+export const activateEmpleado = async (id) => {
+    // Coincide con la función activateEmpleado del controlador
+    return await axiosAdmin.put(`/empleados/activate/${id}`);
+};
+
+export const deactivateEmpleado = async (id) => {
+    // Coincide con la función deactivateEmpleado del controlador
+    return await axiosAdmin.put(`/empleados/deactivate/${id}`);
+};
+
+// ================= USUARIOS =================
+export const getUsuarios = async () => {
+    return await axiosAdmin.get("/usuarios");
+};
+
+export const getUserById = async (id) => {
+    return await axiosAdmin.get(`/usuarios/${id}`);
+};
