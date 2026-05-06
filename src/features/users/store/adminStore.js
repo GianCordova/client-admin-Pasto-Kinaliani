@@ -4,11 +4,13 @@ import {
     saveEmpleado as saveEmpleadoRequest,
     updateEmpleado as updateEmpleadoRequest,
     activateEmpleado as activateRequest,
-    deactivateEmpleado as deactivateRequest
+    deactivateEmpleado as deactivateRequest,
+    getUsuarios as getUsuariosRequest 
 } from "../../../shared/api"; // Ajusta la ruta
 
 export const useAdminStore = create((set, get) => ({
     empleados: [],
+    usuarios: [],
     loading: false,
     error: null,
 
@@ -90,6 +92,22 @@ export const useAdminStore = create((set, get) => ({
             return res.data;
         } catch (err) {
             set({ loading: false, error: err.response?.data?.message });
+        }
+    },
+
+    getUsuarios: async () => {
+        try {
+            set({ loading: true, error: null });
+            const res = await getUsuariosRequest();
+            set({
+                usuarios: res.data.usuarios,
+                loading: false,
+            });
+        } catch (err) {
+            set({
+                loading: false,
+                error: err.response?.data?.message || "Error al obtener usuarios",
+            });
         }
     },
 }));

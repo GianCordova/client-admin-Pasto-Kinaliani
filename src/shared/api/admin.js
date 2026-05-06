@@ -28,3 +28,12 @@ export const deactivateEmpleado = async (id) => {
     // Coincide con la función deactivateEmpleado del controlador
     return await axiosAdmin.put(`/empleados/deactivate/${id}`);
 };
+
+// ================= USUARIOS =================
+export const getUsuarios = async () => {
+    return await axiosAdmin.get("/usuarios");
+};
+
+export const getUserById = async (id) => {
+    return await axiosAdmin.get(`/usuarios/${id}`);
+};
