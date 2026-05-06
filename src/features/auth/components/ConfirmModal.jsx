@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const ConfirmModal = ({ title, message, onConfirm }) => {
+export const ConfirmModal = ({ isOpen, onClose, title, message, onConfirm }) => {
     if (!isOpen) return null;
 
     return (
@@ -14,13 +14,11 @@ export const ConfirmModal = ({ title, message, onConfirm }) => {
                     </div>
 
                     <h2 className="text-2xl font-bold text-center text-gray-800 mb-2">
-                        ¿Estás seguro?
+                        {title || "¿Estás seguro?"}
                     </h2>
 
                     <p className="text-center text-gray-600 mb-6">
-                        Estás a punto de eliminar la sucursal <br />
-                        <span className="font-semibold text-gray-900">{sucursal?.nombre}</span>. <br />
-                        Esta acción no se puede deshacer.
+                        {message}
                     </p>
 
                     <div className="flex gap-4">
@@ -34,12 +32,12 @@ export const ConfirmModal = ({ title, message, onConfirm }) => {
                         <button
                             type="button"
                             onClick={() => {
-                                onConfirm();
+                                if (onConfirm) onConfirm();
                                 onClose();
                             }}
                             className="flex-1 px-4 py-2.5 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition-colors"
                         >
-                            Eliminar
+                            Confirmar
                         </button>
                     </div>
                 </div>

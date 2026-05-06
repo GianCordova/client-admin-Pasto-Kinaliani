@@ -3,7 +3,7 @@ import {
     getSucursales as getSucursalesRequest,
     createSucursal as createSucursalRequest,
     updateSucursal as _updateSucursalRequest,
-    deleteSucursal as _deleteSucursalRequest,
+    toggleSucursalStatus as _toggleSucursalStatusRequest,
 } from "../../../shared/api";
 
 export const useSucursalesStore = create((set, get) => ({
@@ -43,6 +43,42 @@ export const useSucursalesStore = create((set, get) => ({
             set({
                 loading: false,
                 error: error.response?.data?.message || "Error al crear sucursal",
+            });
+        }
+    },
+
+    updateSucursal: async (formData, id) => {
+        try {
+            set({ loading: true, error: null });
+            const response = await _updateSucursalRequest(id, formData);
+            set({
+                sucursales: get().sucursales.map((sucursal) => 
+                    sucursal._id === id ? response.data.data : sucursal
+                ),
+                loading: false,
+            });
+        } catch (error) {
+            set({
+                loading: false,
+                error: error.response?.data?.message || "Error al actualizar sucursal",
+            });
+        }
+    },
+
+    toggleSucursalStatus: async (id, isActive) => {
+        try {
+            set({ loading: true, error: null });
+            const response = await _toggleSucursalStatusRequest(id, isActive);
+            set({
+                sucursales: get().sucursales.map((sucursal) => 
+                    sucursal._id === id ? response.data.data : sucursal
+                ),
+                loading: false,
+            });
+        } catch (error) {
+            set({
+                loading: false,
+                error: error.response?.data?.message || "Error al cambiar estado de la sucursal",
             });
         }
     },

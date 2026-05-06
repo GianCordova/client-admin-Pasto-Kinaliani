@@ -4,7 +4,7 @@ import { useUIStore } from '../../auth/store/uiStore';
 import { useEffect, useState } from 'react';
 import { useEffect as useToastEffect } from 'react';
 import { showError } from '../../../shared/utils/toast';
-import { deleteSucursal } from '../../../shared/api';
+import { ConfirmModal } from '../../auth/components/ConfirmModal';
 
 /**
  * Componente para la administración de Sucursales.
@@ -13,8 +13,8 @@ import { deleteSucursal } from '../../../shared/api';
 export const Sucursales = () => {
     // Datos temporales basados en el esquema de Sucursales
 
-    const { sucursales, loading, error, getSucursales } = useSucursalesStore();
-    const { openConfirm } = useUIStore();
+    const { sucursales, loading, error, getSucursales, toggleSucursalStatus } = useSucursalesStore();
+    const { openConfirm, confirm, closeConfirm } = useUIStore();
 
     const [openModal, setOpenModal] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
@@ -73,12 +73,12 @@ export const Sucursales = () => {
                     /* CARD */
                     <div
                         key={sucursal._id}
-                        className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 hover:scale-[1.02]">
+                        className={`bg-white rounded-xl shadow-md transition-all duration-300 overflow-hidden border border-gray-100 ${!sucursal.isActive ? 'opacity-60 grayscale-[50%]' : 'hover:shadow-xl hover:scale-[1.02]'}`}>
 
                         {/* IMAGEN */}
                         <div className="w-full h-52 bg-gray-100 flex items-center justify-center">
                             <img
-                                src={`https://res.cloudinary.com/dzvyh0ywj/image/upload/v1777941991/kinalSports/${sucursal.photo}`}
+                                src={`https://res.cloudinary.com/dzvyh0ywj/image/upload/PASTO_KINALIANI/${sucursal.photo}`}
                                 alt={sucursal.nombre}
                                 className="max-h-full max-w-full object-contain rounded-t-xl"
                             />
@@ -93,11 +93,15 @@ export const Sucursales = () => {
                             {/* BADGES */}
                             <div className="flex gap-2 mt-2 flex-wrap">
                                 <span className="px-3 py-1 text-xs rounded-full bg-blue-100 text-blue-700 font-medium">
-                                    {sucursal.horario}
+                                    {sucursal.horario?.apertura} - {sucursal.horario?.cierre}
                                 </span>
 
                                 <span className="px-3 py-1 text-xs rounded-full bg-green-100 text-green-700 font-medium">
                                     {sucursal.telefono}
+                                </span>
+
+                                <span className={`px-3 py-1 text-xs rounded-full font-medium ${sucursal.estado === 'Abierto' ? 'bg-emerald-100 text-emerald-700' : sucursal.estado === 'Cerrado' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>
+                                    {sucursal.estado || (sucursal.isActive ? 'Activa' : 'Inactiva')}
                                 </span>
                             </div>
 
@@ -117,19 +121,19 @@ export const Sucursales = () => {
                                     ✏️ Editar
                                 </button>
 
-                                <button className="flex-1 py-2 rounded-lg bg-red-600 text-white font-medium hover:bg-red-700 transition"
+                                <button
+                                    className={`flex-1 py-2 rounded-lg text-white font-medium transition ${sucursal.isActive ? 'bg-red-600 hover:bg-red-700' : 'bg-emerald-600 hover:bg-emerald-700'}`}
                                     onClick={() => {
-                                        console.log("boton presionado eliminar");
-                                        showConfirmToast({
-                                            title: "Eliminar Sucursal",
-                                            message: `¿Eliminar ${sucursal.nombre}?`,
-                                            onConfirm: () => {
-                                                deleteField(sucursal._id);
+                                        openConfirm(
+                                            sucursal.isActive ? "Desactivar Sucursal" : "Activar Sucursal",
+                                            `¿Seguro que quieres ${sucursal.isActive ? 'desactivar' : 'activar'} la sucursal ${sucursal.nombre}?`,
+                                            () => {
+                                                toggleSucursalStatus(sucursal._id, sucursal.isActive);
                                             }
-                                        })
+                                        );
                                     }}
                                 >
-                                    🗑️ Eliminar
+                                    {sucursal.isActive ? '🗑️ Desactivar' : '✅ Activar'}
                                 </button>
                             </div>
                         </div>
@@ -144,7 +148,15 @@ export const Sucursales = () => {
                     setOpenModal(false);
                     setSelectedItem(null);
                 }}
-                selectedItem={selectedItem}
+                sucursal={selectedItem}
+            />
+
+            <ConfirmModal
+                isOpen={!!confirm}
+                onClose={closeConfirm}
+                title={confirm?.title}
+                message={confirm?.message}
+                onConfirm={confirm?.onConfirm}
             />
         </div>
     );

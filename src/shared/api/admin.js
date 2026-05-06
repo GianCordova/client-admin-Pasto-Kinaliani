@@ -6,7 +6,11 @@ export const getSucursales = async () => {
 }
 
 export const createSucursal = async (sucursalData) => {
-    return await axiosAdmin.post('/sucursales', sucursalData);
+    return await axiosAdmin.post('/sucursales', sucursalData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        }
+    });
 }
 
 export const updateSucursal = async (id, sucursalData) => {
@@ -17,6 +21,7 @@ export const updateSucursal = async (id, sucursalData) => {
     });
 }
 
-export const deleteSucursal = async (id) => {
-    return await axiosAdmin.delete(`/sucursales/${id}`);
+export const toggleSucursalStatus = async (id, isActive) => {
+    const endpoint = isActive ? 'desactivar' : 'activar';
+    return await axiosAdmin.put(`/sucursales/${id}/${endpoint}`);
 }

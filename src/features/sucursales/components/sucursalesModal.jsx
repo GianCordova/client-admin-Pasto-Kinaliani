@@ -95,8 +95,8 @@ export const SucursalesModal = ({ isOpen, onClose, sucursal }) => {
                 {/* Form Body */}
                 <form onSubmit={handleSubmit(onSubmit)} className="p-6">
 
-                    {/* PREVIEW */}
-                    <div className="flex justify-center">
+                    {/* PREVIEW & FILE INPUT */}
+                    <div className="flex flex-col items-center justify-center gap-4 mb-4">
                         <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-2xl bg-gray-100 border flex items-center justify-center overflow-hidden shadow-inner">
                             <span className="text-gray-400 text-xs sm:text-sm">
                                 {preview ? (
@@ -107,6 +107,15 @@ export const SucursalesModal = ({ isOpen, onClose, sucursal }) => {
                                     </span>
                                 )}
                             </span>
+                        </div>
+                        <div className="w-full max-w-xs">
+                            <label className="block text-sm font-medium text-gray-700 mb-1 text-center">Fotografía (Opcional)</label>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                {...register("photo")}
+                                className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100 cursor-pointer"
+                            />
                         </div>
                     </div>
 

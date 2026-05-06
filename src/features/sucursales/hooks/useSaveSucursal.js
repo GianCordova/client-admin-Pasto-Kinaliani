@@ -10,10 +10,11 @@ export const useSaveSucursal = () => {
         formData.append('nombre', data.nombre);
         formData.append('direccion', data.direccion);
         formData.append('telefono', data.telefono);
-        formData.append('horario', data.horario);
+        formData.append('horario.apertura', data.horario.apertura);
+        formData.append('horario.cierre', data.horario.cierre);
 
         if (data.photo?.length > 0) {
-            formData.append('photo', data.photo[0]);
+            formData.append('image', data.photo[0]);
         }
 
         if (sucursalId) {
