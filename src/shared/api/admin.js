@@ -159,3 +159,40 @@ export const getUserById = async (id) => {
     return await axiosAdmin.get(`/usuarios/${id}`);
 };
 
+// ================= INVENTARIO =================
+export const getInventarios = async () => {
+    return await axiosAdmin.get("/inventarios");
+};
+
+export const getInventarioById = async (id) => {
+    return await axiosAdmin.get(`/inventarios/${id}`);
+};
+
+export const createInventario = async (data) => {
+    return await axiosAdmin.post("/inventarios", data);
+};
+
+export const updateInventario = async (id, data) => {
+    return await axiosAdmin.put(`/inventarios/${id}`, data);
+};
+
+export const activarInventario = async (id) => {
+    return await axiosAdmin.put(`/inventarios/${id}/activar`);
+};
+
+export const desactivarInventario = async (id) => {
+    return await axiosAdmin.put(`/inventarios/${id}/desactivar`);
+};
+
+// ================= VENTAS =================
+export const getVentas = async () => {
+    return await axiosAdmin.get("/ventas");
+};
+
+export const getVentaById = async (id) => {
+    return await axiosAdmin.get(`/ventas/${id}`);
+};
+
+export const getVentasBySucursal = async (idSucursal) => {
+    return await axiosAdmin.get(`/ventas/sucursal/${idSucursal}`);
+};

@@ -10,6 +10,8 @@ import {
     togglePlatilloStatus as _togglePlatilloStatusRequest,
 } from "../../../shared/api";
 
+
+
 export const useSucursalesStore = create((set, get) => ({
     sucursales: [],
     loading: false,
