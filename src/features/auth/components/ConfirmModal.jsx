@@ -1,4 +1,5 @@
 import React from 'react';
+import { toast } from "react-hot-toast";
 
 export const ConfirmModal = ({ isOpen, onClose, title, message, onConfirm }) => {
     if (!isOpen) return null;

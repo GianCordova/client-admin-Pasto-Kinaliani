@@ -82,9 +82,11 @@ export const PlatillosForm = ({ isOpen, onClose, platillo }) => {
                     </h2>
                     <button
                         onClick={onClose}
-                        className="text-gray-400 hover:text-gray-600"
+                        className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-md hover:bg-gray-200"
                     >
-                        ✕
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
                     </button>
                 </div>
 
@@ -160,89 +162,26 @@ export const PlatillosForm = ({ isOpen, onClose, platillo }) => {
                         </div>
                     </div>
 
-                    {/* NOMBRE */}
-                    <div>
-                        <label className="text-sm font-medium text-gray-700">
-                            Nombre
-                        </label>
-                        <input
-                            name="nombre"
-                            value={form.nombre}
-                            onChange={handleChange}
-                            className="w-full px-4 py-2 border rounded-lg bg-gray-50"
-                            placeholder="Ej. Pizza Margarita"
-                        />
-                    </div>
-
-                    {/* DESCRIPCIÓN */}
-                    <div>
-                        <label className="text-sm font-medium text-gray-700">
-                            Descripción
-                        </label>
-                        <textarea
-                            name="descripcion"
-                            value={form.descripcion}
-                            onChange={handleChange}
-                            rows={3}
-                            className="w-full px-4 py-2 border rounded-lg bg-gray-50"
-                            placeholder="Ingredientes..."
-                        />
-                    </div>
-
-                    {/* PRECIO + CATEGORÍA */}
-                    <div className="grid grid-cols-2 gap-4">
-
-                        <input
-                            name="precio"
-                            type="number"
-                            value={form.precio}
-                            onChange={handleChange}
-                            className="px-4 py-2 border rounded-lg bg-gray-50"
-                            placeholder="Precio"
-                        />
-
-                        <input
-                            name="categoria"
-                            value={form.categoria}
-                            onChange={handleChange}
-                            className="px-4 py-2 border rounded-lg bg-gray-50"
-                            placeholder="Categoría"
-                        />
-                    </div>
-
-                    {/* ACTIVO */}
-                    <label className="flex items-center gap-2">
-                        <input
-                            type="checkbox"
-                            name="isActive"
-                            checked={form.isActive}
-                            onChange={handleChange}
-                        />
-                        Activo
-                    </label>
-
-                    {/* BOTONES */}
-                    <div className="flex justify-end gap-3 pt-4">
-
+                    {/* Botones de Acción */}
+                    <div className="mt-8 flex justify-end gap-3">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-4 py-2 bg-gray-200 rounded-lg"
+                            className="px-5 py-2.5 text-gray-600 bg-gray-100 hover:bg-gray-200 font-medium rounded-lg transition-colors"
                         >
                             Cancelar
                         </button>
-
                         <button
                             type="submit"
-                            className="px-4 py-2 bg-orange-500 text-white rounded-lg"
+                            className="px-5 py-2.5 bg-orange-400 hover:bg-orange-500 text-white font-medium rounded-lg transition-colors shadow-sm"
                         >
                             {platillo ? 'Guardar Cambios' : 'Crear Platillo'}
                         </button>
-
                     </div>
-
                 </form>
             </div>
         </div>
     );
 };
+
+export default PlatillosForm;

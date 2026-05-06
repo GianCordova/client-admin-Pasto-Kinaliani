@@ -158,3 +158,4 @@ export const getUsuarios = async () => {
 export const getUserById = async (id) => {
     return await axiosAdmin.get(`/usuarios/${id}`);
 };
+

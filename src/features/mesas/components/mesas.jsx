@@ -1,60 +1,90 @@
-import React, { useState } from 'react';
-import { MesasModal } from './mesasModal';
-import { MesasModalDelete } from './mesasModalDelete';
+import React, { useState, useEffect } from 'react';
+import { MesasModal } from './MesasModal';
+import { showConfirmToast } from '../../auth/components/ConfirmModalFer';
+import { toast } from 'react-hot-toast';
 
-/**
- * Componente para la administración de mesas en el restaurante.
- * Incluye datos temporales, estados de disponibilidad y diseño responsivo.
- */
 export const Mesas = () => {
-    // Datos temporales para simular la respuesta de una API
-    const [mesas, setMesas] = useState([
-        { id: "M-001", capacity: 4, branch: "La Reformita", employee: "Juan Pérez", availability: true },
-        { id: "M-002", capacity: 2, branch: "Zona 10", employee: "María García", availability: false },
-        { id: "M-003", capacity: 6, branch: "La Reformita", employee: "Sin asignar", availability: true },
-        { id: "M-004", capacity: 4, branch: "San Cristóbal", employee: "Carlos López", availability: false },
-        { id: "M-005", capacity: 8, branch: "Zona 10", employee: "Ana Martínez", availability: true },
-        { id: "M-006", capacity: 2, branch: "La Reformita", employee: "Juan Pérez", availability: true },
-    ]);
-
-    // Estados para filtros
+    const [mesas, setMesas] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
-    const [filterStatus, setFilterStatus] = useState("todos");
-
-    // Modal State
+    const [filterStatus, setFilterStatus] = useState("todos"); // "todos", "disponible", "ocupada"
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [selectedMesa, setSelectedMesa] = useState(null);
+
+    const API_URL = "http://localhost:3002/gestionRestaurantes/v1/admin/mesas";
+
+    const fetchMesas = async () => {
+        try {
+            const response = await fetch(API_URL);
+            const data = await response.json();
+            if (data.success) {
+                setMesas(data.mesas || []);
+            }
+        } catch (error) {
+            console.error("Error al cargar mesas:", error);
+            toast.error("No se pudieron cargar las mesas");
+        }
+    };
+
+    useEffect(() => {
+        fetchMesas();
+    }, []);
 
     const handleOpenModal = (mesa = null) => {
         setSelectedMesa(mesa);
         setIsModalOpen(true);
     };
 
-    const handleOpenDeleteModal = (mesa) => {
-        setSelectedMesa(mesa);
-        setIsDeleteModalOpen(true);
+    const handleDeactivate = (mesa) => {
+        showConfirmToast({
+            title: "¿Desactivar Mesa?",
+            message: `La mesa #${mesa.numero} pasará a estar no disponible.`,
+            onConfirm: async () => {
+                try {
+                    const response = await fetch(`${API_URL}/deactivate/${mesa._id}`, {
+                        method: 'PUT'
+                    });
+                    if (response.ok) {
+                        toast.success("Estado actualizado");
+                        fetchMesas();
+                    }
+                } catch (error) {
+                    toast.error("Error al comunicar con el servidor");
+                }
+            }
+        });
     };
 
-    const handleConfirmDelete = () => {
-        // API call or state change for delete goes here
-        console.log("Deleted mesa:", selectedMesa?.id);
-    };
+    // --- LÓGICA DE FILTRADO MEJORADA ---
+    const filteredMesas = mesas.filter(m => {
+        // Filtro por texto (Número de mesa o nombre de sucursal)
+        const matchesSearch =
+            m.sucursal?.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            m.numero?.toString().includes(searchTerm);
+
+        // Filtro por estado (Select)
+        let matchesStatus = true;
+        if (filterStatus === "disponible") {
+            matchesStatus = m.isAvailable === true;
+        } else if (filterStatus === "ocupada") {
+            matchesStatus = m.isAvailable === false;
+        }
+
+        return matchesSearch && matchesStatus;
+    });
 
     return (
-        <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
+        <div className="p-4 md:p-6 bg-gray-50 min-h-screen font-sans">
             {/* HEADER */}
             <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-800">Mesas</h1>
+                    <h1 className="text-3xl font-bold text-gray-800 tracking-tight">Gestión de Mesas</h1>
                     <p className="text-gray-500 text-sm mt-1">
-                        Administra las mesas, consulta su información y cambia su disponibilidad en tiempo real.
+                        Administra la capacidad y disponibilidad de mesas por sucursal.
                     </p>
                 </div>
-
-                <button 
+                <button
                     onClick={() => handleOpenModal()}
-                    className="bg-orange-400 px-5 py-2.5 rounded-lg text-white font-semibold shadow-md hover:bg-indigo-700 transition-all flex items-center justify-center gap-2"
+                    className="bg-orange-400 px-5 py-2.5 rounded-lg text-white font-semibold shadow-md hover:bg-orange-500 transition-all flex items-center justify-center gap-2"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
@@ -64,145 +94,111 @@ export const Mesas = () => {
             </div>
 
             {/* FILTROS */}
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-6">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="md:col-span-3 relative">
-                        <input
-                            type="text"
-                            placeholder="Buscar por sucursal o empleado..."
-                            className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-200 focus:border-orange-400 outline-none transition"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                        <span className="absolute left-3 top-3 text-gray-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                        </span>
-                    </div>
-                    <select
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-orange-200"
-                        value={filterStatus}
-                        onChange={(e) => setFilterStatus(e.target.value)}
-                    >
-                        <option value="todos">Todos los estados</option>
-                        <option value="disponible">Disponible</option>
-                        <option value="ocupada">Ocupada</option>
-                    </select>
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-6 flex flex-col md:flex-row gap-4">
+                <div className="relative flex-1">
+                    <input
+                        type="text"
+                        placeholder="Buscar por número o sucursal..."
+                        className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-100 focus:border-orange-400 outline-none transition-all text-gray-600"
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    <span className="absolute left-4 top-3.5 text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </span>
                 </div>
+
+                {/* SELECT DE ESTADO ACTUALIZADO */}
+                <select
+                    className="p-3 border border-gray-200 rounded-xl outline-none focus:border-orange-400 text-gray-600 cursor-pointer bg-white"
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                >
+                    <option value="todos">Todos los estados</option>
+                    <option value="disponible">Disponibles (Libres)</option>
+                    <option value="ocupada">Ocupadas</option>
+                </select>
             </div>
 
-            {/* TABLA DE SUCURSALES */}
+            {/* TABLA */}
             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
+                    <table className="min-w-full divide-y divide-gray-200 text-left">
                         <thead className="bg-gray-50">
                             <tr>
-                                <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Capacidad</th>
-                                <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Direccion Sucursal</th>
-                                <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Empleado</th>
-                                <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Disponibilidad</th>
-                                <th scope="col" className="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Acciones</th>
+                                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">N° Mesa</th>
+                                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Capacidad</th>
+                                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Sucursal</th>
+                                <th className="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Estado</th>
+                                <th className="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Gestión</th>
                             </tr>
                         </thead>
-
                         <tbody className="bg-white divide-y divide-gray-100">
-                            {mesas.length === 0 ? (
-                                <tr>
-                                    <td colSpan="6" className="px-6 py-12 text-center text-gray-400">
-                                        No hay sucursales registradas en el sistema.
-                                    </td>
-                                </tr>
-                            ) : (
-                                mesas.map((m) => (
-                                    <tr key={m.id} className="hover:bg-gray-50/50 transition-colors">
-                                        {/* Nombre con ID pequeño */}
+                            {filteredMesas.length > 0 ? (
+                                filteredMesas.map((mesa) => (
+                                    <tr key={mesa._id} className="hover:bg-gray-50/50 transition-colors">
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="text-sm font-bold text-gray-900">{m.capacity}</div>
-                                        </td>
-
-                                        {/* Dirección con truncado inteligente */}
-                                        <td className="px-6 py-4 max-w-xs">
-                                            <div className="text-sm text-gray-600 truncate" title={m.branch}>
-                                                {m.branch}
+                                            <div className="text-sm font-bold text-gray-900">Mesa #{mesa.numero}</div>
+                                            <div className="text-[10px] text-gray-400 font-mono mt-1 uppercase">
+                                                ID: {mesa._id.substring(0, 8)}...
                                             </div>
                                         </td>
-
-                                        {/* Empleado asignado */}
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="text-sm font-bold text-gray-900">{m.employee}</div>
+                                        <td className="px-6 py-4 text-sm text-gray-600">
+                                            {mesa.capacidad} Personas
                                         </td>
-
-                                        {/* Disponibilidad */}
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className={`px-3 py-1 rounded-full text-xs font-bold ${m.availability
-                                                ? "bg-green-100 text-green-700"
-                                                : "bg-red-100 text-red-700"
+                                        <td className="px-6 py-4 text-sm text-gray-600">
+                                            {mesa.sucursal?.nombre || 'N/A'}
+                                        </td>
+                                        <td className="px-6 py-4 text-center">
+                                            <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase ${mesa.isAvailable ? "bg-emerald-100 text-emerald-700" : "bg-red-50 text-red-400"
                                                 }`}>
-                                                {m.availability ? "Disponible" : "Ocupada"}
+                                                {mesa.isAvailable ? "Libre" : "Ocupada"}
                                             </span>
                                         </td>
-
-                                        {/* Acciones */}
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                                            <div className="flex justify-end gap-2">
-                                                <button 
-                                                    onClick={() => handleOpenModal(m)}
-                                                    className="p-2 text-gray-400 hover:text-indigo-600 transition-colors"
+                                        <td className="px-6 py-4 text-right">
+                                            <div className="flex justify-end gap-3">
+                                                <button
+                                                    onClick={() => handleOpenModal(mesa)}
+                                                    className="p-2 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all shadow-sm"
+                                                    title="Editar"
                                                 >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                     </svg>
                                                 </button>
-                                                <button 
-                                                    onClick={() => handleOpenDeleteModal(m)}
-                                                    className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+
+                                                <button
+                                                    onClick={() => handleDeactivate(mesa)}
+                                                    className="p-2 rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-sm"
+                                                    title="Desactivar"
                                                 >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                     </svg>
                                                 </button>
                                             </div>
                                         </td>
                                     </tr>
                                 ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="5" className="p-10 text-center text-gray-400">
+                                        No se encontraron mesas que coincidan con los criterios.
+                                    </td>
+                                </tr>
                             )}
                         </tbody>
                     </table>
                 </div>
-
-                {/* FOOTER / PAGINACIÓN */}
-                <div className="bg-gray-50 px-6 py-4 border-t border-gray-100 flex items-center justify-between">
-                    <div className="text-xs text-gray-500 font-medium">
-                        Total: <span className="text-gray-800">{mesas.length} mesas</span> registradas
-                    </div>
-                    <div className="flex gap-2">
-                        <button className="p-2 border border-gray-200 rounded bg-white text-gray-400 hover:bg-gray-50 disabled:opacity-50" disabled>
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                            </svg>
-                        </button>
-                        <button className="p-2 border border-gray-200 rounded bg-white text-gray-600 hover:bg-gray-50">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
             </div>
-            <MesasModal 
+
+            <MesasModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 mesa={selectedMesa}
-            />
-            <MesasModalDelete
-                isOpen={isDeleteModalOpen}
-                onClose={() => setIsDeleteModalOpen(false)}
-                onConfirm={handleConfirmDelete}
-                mesa={selectedMesa}
+                onSuccess={fetchMesas}
             />
         </div>
     );
 };
-
-export default Mesas;
