@@ -49,7 +49,7 @@ export const ProveedoresForm = ({ isOpen, onClose, proveedor, onSuccess }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        const API_URL = "http://localhost:3001/gestionRestaurantes/v1/admin/proveedores";
+        const API_URL = "http://localhost:3002/gestionRestaurantes/v1/proveedores";
         
         try {
             // Priorizamos _id que es el que usa MongoDB por defecto

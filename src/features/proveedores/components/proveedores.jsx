@@ -9,7 +9,7 @@ export const Proveedores = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProveedor, setSelectedProveedor] = useState(null);
 
-  const API_URL = "http://localhost:3001/gestionRestaurantes/v1/admin/proveedores";
+  const API_URL = "http://localhost:3002/gestionRestaurantes/v1/proveedores";
 
   const fetchProveedores = async () => {
     try {
@@ -37,12 +37,12 @@ export const Proveedores = () => {
     setIsModalOpen(true);
   };
 
-  const handleDeleteClick = (proveedor) => {
+ const handleDeleteClick = (proveedor) => {
   const idToDelete = proveedor._id || proveedor.id;
 
   showConfirmToast({
-    title: "¿Eliminar Proveedor?",
-    message: "Esta acción quitará al proveedor del listado oficial.",
+    title: "¿Desactivar Proveedor?",
+    message: "El proveedor permanecerá en la lista pero marcará como inactivo.",
     proveedor,
     onConfirm: async () => {
       try {
@@ -52,11 +52,16 @@ export const Proveedores = () => {
 
         if (!response.ok) {
           const errorData = await response.json();
-          return toast.error(errorData.message || "Error al eliminar");
+          return toast.error(errorData.message || "Error al desactivar");
         }
 
+        // --- CAMBIO AQUÍ: No filtramos, actualizamos el estado ---
         setProveedores(prev =>
-          prev.filter(p => (p._id || p.id) !== idToDelete)
+          prev.map(p => 
+            (p._id || p.id) === idToDelete 
+              ? { ...p, isActive: false } // Cambiamos solo este proveedor
+              : p // Los demás se quedan igual
+          )
         );
 
         toast.success("Proveedor desactivado correctamente");
