@@ -1,3 +1,4 @@
+// src/components/pedidos/PedidosFilter.jsx
 import { useRef, useState } from "react";
 import { usePedidosStore } from "../../users/store/adminStore";
 
@@ -24,8 +25,7 @@ export const PedidosFilter = () => {
 
     // 🔎 aplicar filtros
     const applyFilters = async (f) => {
-        const hasFilters =
-            f.search || f.status || f.from || f.to;
+        const hasFilters = f.search || f.status || f.from || f.to;
 
         if (!hasFilters) {
             await getPedidos();
@@ -40,7 +40,7 @@ export const PedidosFilter = () => {
         });
     };
 
-    // 🔎 búsqueda
+    // 🔎 búsqueda por ID, usuario o sucursal
     const handleSearch = (value) => {
         const updated = { ...filters, search: value };
         setFilters(updated);
@@ -66,7 +66,7 @@ export const PedidosFilter = () => {
     return (
         <div className="w-full flex flex-col gap-4 mb-4 p-4 bg-white rounded-xl shadow-sm border border-gray-100">
 
-            {/* 🔎 + ISLA */}
+            {/* 🔎 BÚSQUEDA + ESTADO */}
             <div className="flex flex-col md:flex-row gap-3 items-center">
 
                 {/* 🔎 SEARCH */}
@@ -81,7 +81,6 @@ export const PedidosFilter = () => {
 
                 {/* 🟧 ISLA DE ESTADOS */}
                 <div className="relative w-full md:w-[420px]">
-
                     <div className="relative flex bg-gray-100 rounded-full p-1">
 
                         {/* 🔶 SLIDER NARANJA */}
@@ -117,9 +116,7 @@ export const PedidosFilter = () => {
                     <input
                         type="datetime-local"
                         value={filters.from}
-                        onChange={(e) =>
-                            handleDateChange("from", e.target.value)
-                        }
+                        onChange={(e) => handleDateChange("from", e.target.value)}
                         className="p-3 border border-gray-200 rounded-xl"
                     />
                 </div>
@@ -130,9 +127,7 @@ export const PedidosFilter = () => {
                     <input
                         type="datetime-local"
                         value={filters.to}
-                        onChange={(e) =>
-                            handleDateChange("to", e.target.value)
-                        }
+                        onChange={(e) => handleDateChange("to", e.target.value)}
                         className="p-3 border border-gray-200 rounded-xl"
                     />
                 </div>

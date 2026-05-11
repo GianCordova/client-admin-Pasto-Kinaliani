@@ -127,34 +127,34 @@ export const usePedidosStore = create((set, get) => ({
     },
 
     getPedidosByStatus: async (status) => {
-        try {
-            set({ loading: true, error: null });
+    try {
+        set({ loading: true, error: null });
 
-            const estadosValidos = ["PENDIENTE", "COMPLETADO", "CANCELADO"];
+        const estadosValidos = ["PENDIENTE", "COMPLETADO", "CANCELADO"];
 
-            if (!estadosValidos.includes(status)) {
-                set({
-                    loading: false,
-                    error: `Estado inválido. Debe ser: ${estadosValidos.join(", ")}`,
-                });
-                return;
-            }
-
-            const res = await getPedidosRequest(`/status/${status}`);
-
-            set({
-                pedidos: res.data.pedidos,
-                loading: false,
-            });
-        } catch (err) {
+        if (status && !estadosValidos.includes(status)) {
             set({
                 loading: false,
-                error:
-                    err.response?.data?.message ||
-                    "Error al obtener pedidos por estado",
+                error: `Estado inválido. Debe ser: ${estadosValidos.join(", ")}`,
             });
+            return;
         }
-    },
+
+        // Si no hay status seleccionado, traer todos los pedidos
+        const endpoint = status ? `/status/${status}` : "";
+        const res = await getPedidosRequest(endpoint);
+
+        set({
+            pedidos: res.data.pedidos,
+            loading: false,
+        });
+    } catch (err) {
+        set({
+            loading: false,
+            error: err.response?.data?.message || "Error al obtener pedidos por estado",
+        });
+    }
+},
 }));
 
 /* =========================
@@ -573,7 +573,7 @@ export const useVentasStore = create((set) => ({
             const res = await getVentasRequest();
 
             set({
-                ventas: res.data.ventas,
+                ventas: res.data.data,
                 loading: false,
             });
         } catch (err) {

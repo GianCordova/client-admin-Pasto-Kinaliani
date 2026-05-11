@@ -75,7 +75,7 @@ export const Platillos = () => {
             {/* IMAGEN */}
             <div className="w-full h-52 bg-gray-100 relative flex items-center justify-center">
               <img
-                src={`https://res.cloudinary.com/dzvyh0ywj/image/upload/${platillo.photo}`}
+                src={`https://res.cloudinary.com/dzvyh0ywj/image/upload/PASTO_KINALIANI/${platillo.photo}`}
                 alt={platillo.nombre}
                 className="max-h-full max-w-full object-contain rounded-t-xl"
               />
