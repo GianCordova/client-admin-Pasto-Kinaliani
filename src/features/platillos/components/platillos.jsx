@@ -1,86 +1,60 @@
-import { useState } from "react";
-import { PlatillosForm } from "./platillosForm";
-import { PlatillosModalDelete } from "./platillosModalDelete.jsx";
+import { useUIStore } from '../../auth/store/uiStore';
+import { useEffect, useState } from 'react';
+import { useEffect as useToastEffect } from 'react';
+import { showError } from '../../../shared/utils/toast';
+import { ConfirmModal } from '../../auth/components/ConfirmModal';
+import { PlatillosForm } from './PlatillosForm';
+import { usePlatillosStore } from '../../platillos/store/platillosStore';
+
 
 export const Platillos = () => {
   // Datos temporales (Equivalente al setProveedores)
-  const [platillos, setPlatillos] = useState([
-    {
-      id: "65f1a2b3c4d5e6f7a8b90201",
-      nombre: "Pizza Margarita",
-      descripcion: "Clásica con tomate, mozzarella y albahaca",
-      precio: 80,
-      categoria: "Comida Italiana",
-      isActive: true
-    },
-    {
-      id: "65f1a2b3c4d5e6f7a8b90202",
-      nombre: "Hamburguesa Doble",
-      descripcion: "Carne doble con queso y papas",
-      precio: 65,
-      categoria: "Comida Rápida",
-      isActive: false
+  const { platillos, loading, error, getPlatillos, togglePlatilloStatus } = usePlatillosStore();
+  const { openConfirm, confirm, closeConfirm } = useUIStore();
+
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+
+  useEffect(() => {
+    getPlatillos();
+  }, [getPlatillos]);
+
+  useToastEffect(() => {
+    if (error) {
+      showError(error);
     }
-  ]);
+  }, [error]);
 
-  const [searchTerm, setSearchTerm] = useState("");
-
-  // MODAL STATE (Igual a Proveedores)
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedPlatillo, setSelectedPlatillo] = useState(null);
-
-  // FUNCIONES DE CONTROL (Igual a Proveedores)
-  const handleOpenModal = (platillo = null) => {
-    setSelectedPlatillo(platillo);
-    setIsModalOpen(true);
-  };
-
-  const handleOpenDeleteModal = (platillo) => {
-    setSelectedPlatillo(platillo);
-    setIsDeleteModalOpen(true);
-  };
-
-  const handleConfirmDelete = () => {
-    console.log("Deleted platillo:", selectedPlatillo?.nombre);
-    // Aquí iría tu lógica de API
-    setIsDeleteModalOpen(false);
-  };
-
-  // FILTRO (Igual a Proveedores, ajustado a campos de Platillos)
-  const filteredPlatillos = platillos.filter(p => 
-    p.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.categoria.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   return (
-    <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
-      
-      {/* HEADER (Diseño original de Platillos, lógica de Proveedores) */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-3">
+    <div className="p-4 md:p-6 bg-gray-50 min-h-screen font-sans">
+      {/* HEADER */}
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
         <div>
-          <h2 className="text-3xl font-bold text-gray-800 tracking-tight">Platillos</h2>
-          <p className="text-gray-500 text-sm mt-1">Gestión del menú y disponibilidad de platillos.</p>
+          <h1 className="text-3xl font-bold text-gray-800 tracking-tight">Platillos</h1>
+          <p className="text-gray-500 text-sm mt-1">
+            Gestiona los platillos que se ofrecen en el restaurante.
+          </p>
         </div>
 
-        <button 
-          onClick={() => handleOpenModal()} 
-          className="group relative px-5 py-2.5 rounded-lg bg-main-blue text-white flex items-center justify-center overflow-hidden transition-all duration-300 hover:shadow-lg font-semibold"
+        <button
+          className="bg-orange-400 px-5 py-2.5 rounded-lg text-white font-semibold shadow-md hover:bg-indigo-700 transition-all flex items-center justify-center gap-2"
+          onClick={() => { setOpenModal(true); setSelectedItem(null); }}
         >
-          <img src="/src/assets/img/add.png" alt="agregar" className="w-5 h-5 filter invert mr-2" />
-          <span>Nuevo Platillo</span>
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+          </svg>
+          Nuevo Platillo
         </button>
       </div>
 
-      {/* FILTROS (Igual a Proveedores) */}
+      {/* FILTROS */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-6">
         <div className="relative">
           <input
             type="text"
-            placeholder="Buscar por nombre o categoría..."
+            placeholder="Buscar por nombre..."
             className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 outline-none transition-all text-gray-600"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
           />
           <span className="absolute left-4 top-3.5 text-gray-400">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -90,74 +64,96 @@ export const Platillos = () => {
         </div>
       </div>
 
-      {/* GRID DE CARDS (Diseño original de Platillos) */}
+      {/* GRID */}
       <div className="grid sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {filteredPlatillos.length === 0 ? (
-          <div className="col-span-full text-center py-12 text-gray-400">
-            No se encontraron platillos que coincidan con la búsqueda.
-          </div>
-        ) : (
-          filteredPlatillos.map((platillo) => (
-            <div
-              key={platillo.id}
-              className="bg-white rounded-xl shadow-md border border-gray-100 p-5 hover:shadow-xl transition"
-            >
-              <h3 className="text-lg font-bold text-main-blue">{platillo.nombre}</h3>
-              <div className="text-[10px] text-gray-400 font-mono mt-1 uppercase tracking-tighter">ID: {platillo.id.substring(0, 8)}...</div>
+        {platillos.map((platillo) => (
+          /* CARD */
+          <div
+            key={platillo._id}
+            className={`bg-white rounded-xl shadow-md transition-all duration-300 overflow-hidden border border-gray-100 ${!platillo.isActive ? 'opacity-60 grayscale-[50%]' : 'hover:shadow-xl hover:scale-[1.02]'}`}>
 
-              <div className="mt-3 space-y-1 text-sm text-gray-700">
-                <p><span className="font-semibold">Descripción:</span> {platillo.descripcion}</p>
-                <p><span className="font-semibold">Precio:</span> Q{platillo.precio}</p>
-                <p><span className="font-semibold">Categoría:</span> {platillo.categoria}</p>
+            {/* IMAGEN */}
+            <div className="w-full h-52 bg-gray-100 relative flex items-center justify-center">
+              <img
+                src={`https://res.cloudinary.com/dzvyh0ywj/image/upload/PASTO_KINALIANI/${platillo.photo}`}
+                alt={platillo.nombre}
+                className="max-h-full max-w-full object-contain rounded-t-xl"
+              />
+              <div className="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full shadow-sm">
+                <span className="font-black text-orange-600">Q{platillo.precio}</span>
               </div>
+            </div>
 
-              <div className="mt-4">
-                <span className={`px-3 py-1 text-xs rounded-full font-bold uppercase tracking-wider
-                  ${platillo.isActive ? "bg-green-100 text-green-700" : "bg-red-50 text-red-400 border border-red-100"}`}>
-                  {platillo.isActive ? "Activo" : "Inactivo"}
+            {/* CONTENIDO */}
+            <div className="p-5">
+              <h2 className="text-xl font-bold text-main-blue">
+                {platillo.nombre}
+              </h2>
+
+              {/* BADGES */}
+              <div className="flex gap-2 mt-2 flex-wrap">
+
+                <span className={`px-3 py-1 text-xs rounded-full font-medium bg-orange-100 text-orange-700`}>
+                  {platillo.categoria}
+                </span>
+
+                <span className={`px-3 py-1 text-xs rounded-full font-medium ${platillo.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                  {platillo.isActive ? 'Activo' : 'Inactivo'}
                 </span>
               </div>
 
+              {/* INFO */}
+              <p className="text-xs text-gray-400 mt-2 line-clamp-2">
+                {platillo.descripcion}
+              </p>
+
+              {/* BOTONES */}
               <div className="flex gap-3 mt-5">
-                <button 
-                  onClick={() => handleOpenModal(platillo)}
-                  className="group relative flex-1 py-2 rounded-lg bg-main-blue text-white flex items-center justify-center overflow-hidden transition-all duration-300"
+                <button className="flex-1 py-2 rounded-lg bg-main-blue text-white font-medium hover:opacity-90 transition"
+                  onClick={() => {
+                    setSelectedItem(platillo);
+                    setOpenModal(true);
+                  }}
                 >
-                  <img src="/src/assets/img/pencil.png" alt="editar" className="w-5 h-5 filter invert mr-2" />
-                  <span className="font-medium">Editar</span>
+                  ✏️ Editar
                 </button>
 
-                <button 
-                  onClick={() => handleOpenDeleteModal(platillo)}
-                  className="group relative flex-1 py-2 rounded-lg bg-orange-600 text-white flex items-center justify-center overflow-hidden transition-all duration-300 hover:bg-orange-700"
+                <button
+                  className={`flex-1 py-2 rounded-lg text-white font-medium transition ${platillo.isActive ? 'bg-red-600 hover:bg-red-700' : 'bg-emerald-600 hover:bg-emerald-700'}`}
+                  onClick={() => {
+                    openConfirm(
+                      platillo.isActive ? "Desactivar Platillo" : "Activar Platillo",
+                      `¿Seguro que quieres ${platillo.isActive ? 'desactivar' : 'activar'} el platillo ${platillo.nombre}?`,
+                      () => {
+                        togglePlatilloStatus(platillo._id, platillo.isActive);
+                      }
+                    );
+                  }}
                 >
-                  <img src="/src/assets/img/delete.png" alt="eliminar" className="w-5 h-5 filter invert mr-2" />
-                  <span className="font-medium">Eliminar</span>
+                  {platillo.isActive ? '🗑️ Desactivar' : '✅ Activar'}
                 </button>
               </div>
             </div>
-          ))
-        )}
+          </div>
+        ))}
       </div>
 
-      {/* FOOTER (Igual a Proveedores) */}
-      <div className="mt-6 bg-white px-6 py-4 rounded-xl border border-gray-200 flex items-center justify-between">
-        <div className="text-xs text-gray-500 font-medium">
-          Total: <span className="text-gray-800">{filteredPlatillos.length} platillos</span> en el menú
-        </div>
-      </div>
-
-      {/* MODALES (Igual a Proveedores) */}
-      <PlatillosForm 
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        platillo={selectedPlatillo}
+      {/* MODAL */}
+      <PlatillosForm
+        isOpen={openModal}
+        onClose={() => {
+          setOpenModal(false);
+          setSelectedItem(null);
+        }}
+        platillo={selectedItem}
       />
-      <PlatillosModalDelete
-        isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        onConfirm={handleConfirmDelete}
-        platillo={selectedPlatillo}
+
+      <ConfirmModal
+        isOpen={!!confirm}
+        onClose={closeConfirm}
+        title={confirm?.title}
+        message={confirm?.message}
+        onConfirm={confirm?.onConfirm}
       />
     </div>
   );
