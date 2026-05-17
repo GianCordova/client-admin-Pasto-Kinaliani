@@ -4,7 +4,7 @@ import { useEffect as useToastEffect } from 'react';
 import { showError } from '../../../shared/utils/toast';
 import { ConfirmModal } from '../../auth/components/ConfirmModal';
 import { PlatillosForm } from './PlatillosForm';
-import { usePlatillosStore } from '../../usuarios/store/adminStore';
+import { usePlatillosStore } from '../../platillos/store/platillosStore';
 
 
 export const Platillos = () => {

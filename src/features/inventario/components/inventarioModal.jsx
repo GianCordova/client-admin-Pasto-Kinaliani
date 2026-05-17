@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useInventarioStore } from '../../users/store/adminStore';
-import { useSucursalesStore } from '../../usuarios/store/adminStore';
+import { useInventarioStore } from '../store/inventarioStore';
+import { useSucursalesStore } from '../../sucursales/store/sucursalesStore';
 
 export const InventarioModal = ({ isOpen, onClose, item }) => {
 
@@ -46,9 +46,9 @@ export const InventarioModal = ({ isOpen, onClose, item }) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ 
-            ...prev, 
-            [name]: name === 'cantidad' || name === 'stockMinimo' ? Number(value) : value 
+        setFormData(prev => ({
+            ...prev,
+            [name]: name === 'cantidad' || name === 'stockMinimo' ? Number(value) : value
         }));
     };
 
@@ -70,7 +70,7 @@ export const InventarioModal = ({ isOpen, onClose, item }) => {
         <div className="fixed inset-0 z-50 flex justify-center items-center bg-black/60 backdrop-blur-sm p-4">
 
             <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
-                
+
                 <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                     <h2 className="text-xl font-bold text-gray-800">
                         {isEdit ? "Editar Producto" : "Nuevo Producto"}
@@ -85,21 +85,21 @@ export const InventarioModal = ({ isOpen, onClose, item }) => {
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Nombre del Producto</label>
-                            <input 
-                                name="nombre" 
-                                value={formData.nombre} 
+                            <input
+                                name="nombre"
+                                value={formData.nombre}
                                 onChange={handleChange}
                                 required
-                                placeholder="Ej. Tomates frescos" 
-                                className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-orange-200 outline-none transition-all" 
+                                placeholder="Ej. Tomates frescos"
+                                className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-orange-200 outline-none transition-all"
                             />
                         </div>
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Sucursal</label>
-                            <select 
-                                name="sucursal" 
-                                value={formData.sucursal} 
+                            <select
+                                name="sucursal"
+                                value={formData.sucursal}
                                 onChange={handleChange}
                                 required
                                 className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-orange-200 outline-none transition-all cursor-pointer"
@@ -114,36 +114,36 @@ export const InventarioModal = ({ isOpen, onClose, item }) => {
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Cantidad Actual</label>
-                                <input 
-                                    type="number" 
-                                    name="cantidad" 
-                                    value={formData.cantidad} 
+                                <input
+                                    type="number"
+                                    name="cantidad"
+                                    value={formData.cantidad}
                                     onChange={handleChange}
                                     min="0"
                                     required
-                                    className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-orange-200 outline-none transition-all" 
+                                    className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-orange-200 outline-none transition-all"
                                 />
                             </div>
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Stock Mínimo</label>
-                                <input 
-                                    type="number" 
-                                    name="stockMinimo" 
-                                    value={formData.stockMinimo} 
+                                <input
+                                    type="number"
+                                    name="stockMinimo"
+                                    value={formData.stockMinimo}
                                     onChange={handleChange}
                                     min="0"
                                     required
-                                    className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-orange-200 outline-none transition-all" 
+                                    className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-orange-200 outline-none transition-all"
                                 />
                             </div>
                         </div>
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Estado</label>
-                            <select 
-                                name="estado" 
-                                value={formData.estado} 
+                            <select
+                                name="estado"
+                                value={formData.estado}
                                 onChange={handleChange}
                                 className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-orange-200 outline-none transition-all cursor-pointer"
                             >
@@ -156,14 +156,14 @@ export const InventarioModal = ({ isOpen, onClose, item }) => {
                     </div>
 
                     <div className="flex justify-end gap-3 mt-8 pt-6 border-t border-gray-100">
-                        <button 
+                        <button
                             type="button"
                             onClick={onClose}
                             className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
                         >
                             Cancelar
                         </button>
-                        <button 
+                        <button
                             type="submit"
                             disabled={loading}
                             className="px-5 py-2.5 text-sm font-medium text-white bg-orange-500 rounded-xl hover:bg-orange-600 transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2"

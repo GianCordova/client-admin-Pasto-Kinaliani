@@ -1,5 +1,5 @@
 import { SucursalesModal } from './sucursalesModal';
-import { useSucursalesStore } from '../../usuarios/store/adminStore';
+import { useSucursalesStore } from '../store/sucursalesStore';
 import { useUIStore } from '../../auth/store/uiStore';
 import { useEffect, useState } from 'react';
 import { useEffect as useToastEffect } from 'react';

@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { useAdminStore } from "../../users/store/adminStore.js";
+import { useEmpleadosStore } from "../store/empleadosStore.js";
 import { EmpleadosModal } from "./EmpleadosModal.jsx";
 import { EmpleadosFilter } from "./EmpleadosFilter.jsx";
 import { showConfirmToast } from "../../auth/components/ConfirmModalFer.jsx";
 
 export const Empleados = () => {
-    const { empleados, getEmpleados, deactivateEmpleado } = useAdminStore();
+    const { empleados, getEmpleados, deactivateEmpleado } = useEmpleadosStore();
     const [filtered, setFiltered] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const [selected, setSelected] = useState(null);

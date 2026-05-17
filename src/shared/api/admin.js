@@ -196,3 +196,37 @@ export const getVentaById = async (id) => {
 export const getVentasBySucursal = async (idSucursal) => {
     return await axiosAdmin.get(`/ventas/sucursal/${idSucursal}`);
 };
+
+// ================= MESAS =================
+export const getMesas = async () => {
+    return await axiosAdmin.get("/mesas");
+};
+
+export const createMesa = async (data) => {
+    return await axiosAdmin.post("/mesas", data);
+};
+
+export const updateMesa = async (id, data) => {
+    return await axiosAdmin.put(`/mesas/${id}`, data);
+};
+
+export const deactivateMesa = async (id) => {
+    return await axiosAdmin.put(`/mesas/deactivate/${id}`);
+};
+
+// ================= PROVEEDORES =================
+export const getProveedores = async () => {
+    return await axiosAdmin.get("/proveedores?limit=100");
+};
+
+export const createProveedor = async (data) => {
+    return await axiosAdmin.post("/proveedores", data);
+};
+
+export const updateProveedor = async (id, data) => {
+    return await axiosAdmin.put(`/proveedores/${id}`, data);
+};
+
+export const deactivarProveedor = async (id) => {
+    return await axiosAdmin.put(`/proveedores/${id}/desactivar`);
+};

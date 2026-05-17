@@ -1,8 +1,8 @@
-import { useAdminStore } from "../../users/store/adminStore";
+import { useEmpleadosStore } from "../store/empleadosStore";
 
 export const useSaveEmpleado = () => {
-    const createEmpleado = useAdminStore((state) => state.saveEmpleado);
-    const updateEmpleado = useAdminStore((state) => state.updateEmpleado);
+    const createEmpleado = useEmpleadosStore((state) => state.saveEmpleado);
+    const updateEmpleado = useEmpleadosStore((state) => state.updateEmpleado);
 
     const saveEmpleado = async (data, empleadoId = null) => {
         try {
@@ -11,7 +11,7 @@ export const useSaveEmpleado = () => {
                 surname: data.surname,
                 dpi: data.dpi,
                 puesto: data.puesto,
-                sueldo: Number(data.sueldo), 
+                sueldo: Number(data.sueldo),
                 status: data.status ?? true
             };
 

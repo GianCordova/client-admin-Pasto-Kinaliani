@@ -1,4 +1,4 @@
-import { usePlatillosStore } from "../../usuarios/store/adminStore";
+import { usePlatillosStore } from "../store/platillosStore";
 
 export const useSavePlatillo = () => {
     const createPlatillo = usePlatillosStore((state) => state.createPlatillo);

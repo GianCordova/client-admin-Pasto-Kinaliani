@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Spinner } from "../../auth/components/Spinner";
-import { usePlatillosStore } from "../../usuarios/store/adminStore";
+import { usePlatillosStore } from "../store/platillosStore";
 import { useSavePlatillo } from "../hooks/useSavePlatillo"
 import { showSuccess, showError } from "../../../shared/utils/toast";
 

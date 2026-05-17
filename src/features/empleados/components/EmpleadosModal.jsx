@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-// 1. IMPORTA EL STORE (Ajusta la ruta si es necesario)
-import { useAdminStore } from "../../users/store/adminStore.js";
+import { useEmpleadosStore } from "../store/empleadosStore.js";
 import { useSaveEmpleado } from "../hooks/useSaveEmpleados";
 
 export const EmpleadosModal = ({ isOpen, onClose, empleado }) => {
@@ -9,7 +8,7 @@ export const EmpleadosModal = ({ isOpen, onClose, empleado }) => {
     const { saveEmpleado } = useSaveEmpleado();
 
     // 2. AHORA SÍ DEFINIMOS EL STORE
-    const { getEmpleados } = useAdminStore();
+    const { getEmpleados } = useEmpleadosStore();
 
     const {
         register,

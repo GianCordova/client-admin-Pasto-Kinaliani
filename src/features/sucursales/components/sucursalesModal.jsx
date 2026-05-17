@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
 import { Spinner } from '../../auth/components/Spinner';
-import { useSucursalesStore } from '../../usuarios/store/adminStore';
+import { useSucursalesStore } from '../store/sucursalesStore';
 import { useSaveSucursal } from '../hooks/useSaveSucursal';
 import { showSuccess, showError } from '../../../shared/utils/toast';
 

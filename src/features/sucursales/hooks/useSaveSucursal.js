@@ -1,4 +1,4 @@
-import { useSucursalesStore } from "../../usuarios/store/adminStore";
+import { useSucursalesStore } from "../store/sucursalesStore";
 
 export const useSaveSucursal = () => {
     const createSucursal = useSucursalesStore((state) => state.createSucursal);

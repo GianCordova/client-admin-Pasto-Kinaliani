@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useReservationsStore } from "../../users/store/adminStore.js";
+import { useReservationsStore } from "../store/reservacionesStore";
 import { ReservacionesForm } from "./ReservacionesModal.jsx";
 import { ReservacionesFilter } from "./ReservacionesFilter.jsx";
 import { showConfirmToast } from "../../auth/components/ConfirmModalFer.jsx";

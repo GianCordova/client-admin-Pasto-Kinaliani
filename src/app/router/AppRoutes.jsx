@@ -1,4 +1,5 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
+import { useAuthStore } from "../../features/auth/store/authStore.js";
 import { AuthPage } from "../../features/auth/pages/AuthPage.jsx";
 import { DashboardContainer } from "../../shared/components/layout/DashboardContainer.jsx";
 import { Empleados } from "../../features/empleados/components/Empleados.jsx";
@@ -13,14 +14,19 @@ import { Usuarios } from "../../features/usuarios/components/Usuarios.jsx";
 import { Ventas } from "../../features/ventas/components/Ventas.jsx";
 
 export const AppRoutes = () => {
+    const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
     return (
         <Routes>
             {/* Publicas */}
-            <Route path="/" element={<AuthPage />} />
+            <Route path="/" element={
+                isAuthenticated ? <Navigate to="/dashboard" replace /> : <AuthPage />
+            } />
 
             {/* Protegido por role */}
-            <Route path="/dashboard" element={<DashboardContainer />}>
+            <Route path="/dashboard" element={
+                isAuthenticated ? <DashboardContainer /> : <Navigate to="/" replace />
+            }>
                 <Route path="empleados" element={<Empleados />} />
                 <Route path="inventario" element={<Inventario />} />
                 <Route path="mesas" element={<Mesas />} />

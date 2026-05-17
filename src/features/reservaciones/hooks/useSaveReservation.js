@@ -1,4 +1,4 @@
-import { useReservationsStore } from "../../users/store/adminStore";
+import { useReservationsStore } from "../store/reservacionesStore";
 
 export const useSaveReservation = () => {
 
