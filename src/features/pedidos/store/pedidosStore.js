@@ -4,6 +4,9 @@ import {
     createPedido as createPedidoRequest,
     cancelPedido as cancelPedidoRequest,
     completadoPedido as completadoPedidoRequest,
+    getPedidosByStatus as getPedidosByStatusRequest,
+    getPedidosBySucursal as getPedidosBySucursalRequest,
+    getPedidosByUsuario as getPedidosByUsuarioRequest
 } from "../../../shared/api";
 
 export const usePedidosStore = create((set, get) => ({
@@ -88,32 +91,109 @@ export const usePedidosStore = create((set, get) => ({
     },
 
     getPedidosByStatus: async (status) => {
+
         try {
-            set({ loading: true, error: null });
 
-            const estadosValidos = ["PENDIENTE", "COMPLETADO", "CANCELADO"];
+            set({
+                loading: true,
+                error: null
+            });
 
-            if (status && !estadosValidos.includes(status)) {
+            const estadosValidos = [
+                "PENDIENTE",
+                "COMPLETADO",
+                "CANCELADO"
+            ];
+
+            if (
+                status &&
+                !estadosValidos.includes(status)
+            ) {
+
                 set({
                     loading: false,
-                    error: `Estado inválido. Debe ser: ${estadosValidos.join(", ")}`,
+                    error: "Estado inválido"
                 });
+
                 return;
             }
 
-            // Si no hay status seleccionado, traer todos los pedidos
-            const endpoint = status ? `/status/${status}` : "";
-            const res = await getPedidosRequest(endpoint);
+            let res;
+
+        
+            if (!status) {
+
+                res = await getPedidosRequest();
+
+            } else {
+                res = await getPedidosByStatusRequest(status);
+            }
 
             set({
                 pedidos: res.data.pedidos,
-                loading: false,
+                loading: false
             });
+
         } catch (err) {
+
+            console.log(err);
+
             set({
                 loading: false,
-                error: err.response?.data?.message || "Error al obtener pedidos por estado",
+                error:
+                    err.response?.data?.message ||
+                    "Error al obtener pedidos por estado"
             });
         }
     },
+    getPedidosBySucursal: async (sucursalId) => {
+
+        try {
+
+            set({
+                loading: true,
+                error: null
+            });
+
+            const res = await getPedidosBySucursalRequest(sucursalId);
+
+            set({
+                pedidos: res.data.pedidos,
+                loading: false
+            });
+
+        } catch (err) {
+
+            set({
+                loading: false,
+                error: err.response?.data?.message || "Error al obtener pedidos por sucursal"
+            });
+        }
+    },
+    
+    getPedidosByUsuario: async (usuarioId) => {
+
+        try {
+
+            set({
+                loading: true,
+                error: null
+            });
+
+            const res = await getPedidosByUsuarioRequest(usuarioId);
+
+            set({
+                pedidos: res.data.pedidos,
+                loading: false
+            });
+
+        } catch (err) {
+
+            set({
+                loading: false,
+                error: err.response?.data?.message || "Error al obtener pedidos por usuario"
+            });
+        }
+    }
+
 }));

@@ -86,6 +86,10 @@ export const getPedidosBySucursal = async (sucursalId) => {
     return await axiosAdmin.get(`/pedidos/sucursal/${sucursalId}`);
 };
 
+export const getPedidosByUsuario = async (usuarioId) => {
+    return await axiosAdmin.get(`/pedidos/usuario/${usuarioId}`);
+};
+
 // ================= RESERVACIONES =================
 
 export const getReservations = async () => {
